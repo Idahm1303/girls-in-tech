@@ -1,0 +1,336 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  MENTOR
+  STUDENT
+}
+
+enum AccountStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+}
+
+enum Campus {
+  SOSHANGUVE
+  EMALAHLENI
+  POLOKWANE
+  GIYANE
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
+  UNAVAILABLE
+}
+
+enum MentorshipSessionStatus {
+  REQUESTED
+  ACCEPTED
+  DECLINED
+  CANCELLED
+  COMPLETED
+}
+
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+enum OpportunityType {
+  WIL
+  LEARNERSHIP
+  BURSARY
+}
+
+enum TeamRoleTitle {
+  LEAD
+  FACILITATOR
+  JOURNALIST
+  COMMITTEE
+}
+
+enum PostStatus {
+  DRAFT
+  PENDING_APPROVAL
+  PUBLISHED
+  REJECTED
+}
+
+enum NotificationType {
+  SESSION_REQUEST
+  SESSION_UPDATE
+  EVENT_RSVP
+  EVENT_REMINDER
+  OPPORTUNITY_DIGEST
+  GENERAL
+}
+
+enum AttachmentType {
+  CV
+  OPPORTUNITY
+  POST_IMAGE
+  OTHER
+}
+
+model User {
+  id              String        @id @default(cuid())
+  name            String
+  surname         String        @default("")
+  email           String        @unique
+  passwordHash    String?
+  role            UserRole      @default(STUDENT)
+  status          AccountStatus @default(PENDING)
+  emailVerifiedAt DateTime?
+  consentAt       DateTime?
+  campus          String?
+  yearOfStudy     Int?
+  isFinalYear     Boolean       @default(false)
+  digestOptIn     Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  studentProfile     StudentProfile?
+  mentorProfile      MentorProfile?
+  interests          UserInterest[]
+  studentSessions    MentorshipSession[] @relation("SessionStudent")
+  mentorSessions     MentorshipSession[] @relation("SessionMentor")
+  eventRsvps         EventRsvp[]
+  savedOpportunities SavedOpportunity[]
+  notifications      Notification[]
+  attachments        Attachment[]        @relation("AttachmentUploader")
+  authoredPosts      Post[]              @relation("PostAuthor")
+  teamMembership     TeamMember?
+
+  @@index([role, status])
+  @@index([campus])
+}
+
+model StudentProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  studentNumber      String?  @unique
+  campus             Campus?
+  qualification      String?
+  profileCompletedAt DateTime?
+  bio                String?
+  skills             String[] @default([])
+  cvUrl              String?
+  portfolioUrl       String?
+  linkedinUrl        String?
+  githubUrl          String?
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MentorProfile {
+  id              String             @id @default(cuid())
+  userId          String             @unique
+  title           String
+  organization    String
+  industry        String
+  yearsExperience Int                @default(0)
+  bio             String
+  profileImageUrl String?
+  isPublished     Boolean            @default(false)
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interests       MentorInterest[]
+  availability    AvailabilitySlot[]
+
+  @@index([industry, isPublished])
+}
+
+model Interest {
+  id       String           @id @default(cuid())
+  name     String           @unique
+  students UserInterest[]
+  mentors  MentorInterest[]
+}
+
+model UserInterest {
+  userId     String
+  interestId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interest   Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@id([userId, interestId])
+}
+
+model MentorInterest {
+  mentorProfileId String
+  interestId      String
+  mentorProfile   MentorProfile @relation(fields: [mentorProfileId], references: [id], onDelete: Cascade)
+  interest        Interest      @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  @@id([mentorProfileId, interestId])
+}
+
+model AvailabilitySlot {
+  id              String             @id @default(cuid())
+  mentorProfileId String
+  startsAt        DateTime
+  endsAt          DateTime
+  status          SlotStatus         @default(AVAILABLE)
+  createdAt       DateTime           @default(now())
+  mentorProfile   MentorProfile      @relation(fields: [mentorProfileId], references: [id], onDelete: Cascade)
+  session         MentorshipSession?
+
+  @@index([mentorProfileId, startsAt])
+  @@index([status, startsAt])
+}
+
+model MentorshipSession {
+  id                 String                  @id @default(cuid())
+  studentId          String
+  mentorId           String
+  availabilitySlotId String?                 @unique
+  status             MentorshipSessionStatus @default(REQUESTED)
+  requestMessage     String?
+  privateNotes       String?
+  feedback           String?
+  rating             Int?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+  student            User                    @relation("SessionStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  mentor             User                    @relation("SessionMentor", fields: [mentorId], references: [id], onDelete: Cascade)
+  availabilitySlot   AvailabilitySlot?       @relation(fields: [availabilitySlotId], references: [id], onDelete: SetNull)
+
+  @@index([studentId, status])
+  @@index([mentorId, status])
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  slug        String      @unique
+  title       String
+  description String
+  startsAt    DateTime
+  endsAt      DateTime
+  timezone    String      @default("Africa/Johannesburg")
+  venue       String?
+  onlineUrl   String?
+  status      EventStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  rsvps       EventRsvp[]
+
+  @@index([status, startsAt])
+}
+
+model EventRsvp {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  attended  Boolean?
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([eventId, attended])
+}
+
+model Opportunity {
+  id              String             @id @default(cuid())
+  slug            String             @unique
+  title           String
+  organization    String
+  description     String
+  type            OpportunityType
+  field           String
+  location        String
+  isFinalYearOnly Boolean            @default(false)
+  closingDate     DateTime
+  applyUrl        String
+  isPublished     Boolean            @default(false)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  savedBy         SavedOpportunity[]
+  attachments     Attachment[]
+
+  @@index([type, isPublished, closingDate])
+  @@index([field, location])
+}
+
+model SavedOpportunity {
+  userId        String
+  opportunityId String
+  appliedAt     DateTime?
+  savedAt       DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+
+  @@id([userId, opportunityId])
+}
+
+model TeamMember {
+  id           String        @id @default(cuid())
+  name         String
+  roleTitle    TeamRoleTitle
+  bio          String
+  imageUrl     String?
+  displayOrder Int           @default(0)
+  userId       String?       @unique
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([displayOrder])
+}
+
+model Post {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  title       String
+  excerpt     String
+  content     String
+  status      PostStatus   @default(DRAFT)
+  authorId    String
+  publishedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  author      User         @relation("PostAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  attachments Attachment[]
+
+  @@index([status, publishedAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+}
+
+model Attachment {
+  id            String         @id @default(cuid())
+  type          AttachmentType @default(OTHER)
+  fileName      String
+  fileUrl       String
+  contentType   String
+  fileSize      Int
+  uploadedById  String?
+  opportunityId String?
+  postId        String?
+  createdAt     DateTime       @default(now())
+  uploadedBy    User?          @relation("AttachmentUploader", fields: [uploadedById], references: [id], onDelete: SetNull)
+  opportunity   Opportunity?   @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  post          Post?          @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([uploadedById, createdAt])
+  @@index([opportunityId])
+  @@index([postId])
+}
