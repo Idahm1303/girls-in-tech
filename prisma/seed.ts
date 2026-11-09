@@ -1,6 +1,8 @@
 import { PrismaClient, UserRole, AccountStatus, Campus, EventStatus, OpportunityType, TeamRoleTitle, PostStatus } from "@prisma/client";
 import { hash } from "bcryptjs";
+import { loadEnvConfig } from "@next/env";
 
+loadEnvConfig(process.cwd());
 const prisma = new PrismaClient();
 const passwordHash = await hash("GirlsInTech2026!", 12);
 

@@ -17,8 +17,10 @@ the community, complete their profile once, and access member areas.
    npm install
    ```
 
-2. Copy `.env.example` to `.env`. Set `DATABASE_URL` to your PostgreSQL
-   connection string and set `AUTH_SECRET` to a unique random secret.
+2. For Neon, run `neon init` and `neon deploy`; the CLI writes pooled
+   `DATABASE_URL` and direct `DATABASE_URL_UNPOOLED` values to `.env.local`.
+   For another PostgreSQL host, copy `.env.example` to `.env` and set both
+   connection strings. Set `AUTH_SECRET` to a unique random secret.
 3. Generate the Prisma client and apply the database migration:
 
    ```bash
@@ -26,6 +28,9 @@ the community, complete their profile once, and access member areas.
    npm run db:migrate
    ```
 
+   Prisma loads `.env.local` for database commands. `DATABASE_URL` is used by
+   the application for pooled connections; Prisma migrations use
+   `DATABASE_URL_UNPOOLED` directly.
 4. Load the development sample data:
 
    ```bash
@@ -70,7 +75,9 @@ environment. The legacy admin and mentor seed accounts use
 
 - `npm run db:generate` regenerates the Prisma client.
 - `npm run db:validate` validates the Prisma schema.
-- `npm run db:migrate` applies pending local development migrations.
+- `npm run db:migrate` applies pending development migrations.
+- `npm run db:migrate:deploy` applies committed migrations to a deployed
+  database such as the Neon production branch.
 - `npm run db:seed` inserts or updates development sample data.
 
 Mentor, events, and opportunities pages are placeholders for a later phase.
