@@ -2,6 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { auth } from "@/../auth";
 import { prisma } from "@/lib/prisma";
+import { canAccessAdmin, isApprovedMentor } from "@/lib/mentor-access";
 import { roleHome } from "@/lib/account-routing";
 export { postLoginPath, roleHome } from "@/lib/account-routing";
 
@@ -17,6 +18,12 @@ export async function getCurrentMember() {
       surname: true,
       email: true,
       role: true,
+      mentorProfile: {
+        select: {
+          status: true,
+          reviewNote: true,
+        },
+      },
       studentProfile: {
         select: {
           studentNumber: true,
@@ -45,5 +52,18 @@ export async function requireStudent() {
 export async function requireRole(role: "MENTOR" | "ADMIN") {
   const member = await requireMember();
   if (member.role !== role) redirect(roleHome[member.role]);
+  if (
+    role === "MENTOR" &&
+    !isApprovedMentor(member.mentorProfile?.status)
+  ) {
+    redirect("/mentor/status");
+  }
+  return member;
+}
+
+export async function requireAdmin() {
+  const member = await getCurrentMember();
+  if (!member) redirect("/admin/login");
+  if (!canAccessAdmin(member.role)) redirect(roleHome[member.role]);
   return member;
 }

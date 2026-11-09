@@ -1,5 +1,6 @@
 import { Suspense } from "react";
-import { headers } from "next/headers";
+import Link from "next/link";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
 import { welcomeFlashSchema } from "@/lib/account-validation";
@@ -22,15 +23,16 @@ async function LoginContent() {
       postLoginPath(
         member.role,
         Boolean(member.studentProfile?.profileCompletedAt),
+        member.mentorProfile?.status,
       ),
     );
   }
 
-  const flashHeader = (await headers()).get("x-git-welcome");
+  const welcomeCookie = (await cookies()).get("git-welcome")?.value;
   let welcome = null;
-  if (flashHeader) {
+  if (welcomeCookie) {
     try {
-      const parsed = welcomeFlashSchema.safeParse(JSON.parse(flashHeader));
+      const parsed = welcomeFlashSchema.safeParse(JSON.parse(welcomeCookie));
       if (parsed.success) welcome = parsed.data;
     } catch (error) {
       if (!(error instanceof SyntaxError)) throw error;
@@ -52,6 +54,9 @@ async function LoginContent() {
         <p className="eyebrow">Welcome back</p>
         <h1 id="login-title">Log in to GiT</h1>
         <LoginForm initialEmail={welcome?.email ?? ""} />
+        <p className="account-switch">
+          Administrator? <Link href="/admin/login">Admin log in</Link>
+        </p>
       </section>
     </main>
   );

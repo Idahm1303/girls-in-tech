@@ -60,6 +60,9 @@ export default function Home() {
               <Link className="button button-light" href="/register">
                 Join GiT <span aria-hidden="true">↗</span>
               </Link>
+              <Link className="button button-outline" href="/mentor/register">
+                Become a Mentor
+              </Link>
               <Link className="button button-outline" href="/mentors">
                 Find a Mentor
               </Link>

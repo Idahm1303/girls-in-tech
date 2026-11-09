@@ -34,6 +34,7 @@ export function SiteHeader() {
               </Link>
             ))}
             <Link href="/contact">Contact</Link>
+            <Link href="/mentor/register">Become a Mentor</Link>
             <Link className="mobile-join-link" href="/register">
               Join GiT
             </Link>
@@ -50,6 +51,7 @@ export function SiteHeader() {
             </Link>
           ))}
           <Link href="/contact">Contact</Link>
+          <Link href="/mentor/register">Become a Mentor</Link>
           <Link className="nav-join-link" href="/register">
             Join GiT <span aria-hidden="true">↗</span>
           </Link>

@@ -23,6 +23,7 @@ export function SiteFooter() {
         <nav aria-label="Footer navigation" className="footer-links">
           <Link href="/about">About GiT</Link>
           <Link href="/events">Events</Link>
+          <Link href="/mentor/register">Become a Mentor</Link>
           <Link href="/contact">Contact</Link>
           <Link href="/login">Member login</Link>
         </nav>

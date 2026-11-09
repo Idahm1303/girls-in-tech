@@ -21,6 +21,7 @@ async function RegisterContent() {
       postLoginPath(
         member.role,
         Boolean(member.studentProfile?.profileCompletedAt),
+        member.mentorProfile?.status,
       ),
     );
   }

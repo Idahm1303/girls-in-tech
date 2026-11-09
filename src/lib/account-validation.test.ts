@@ -166,6 +166,7 @@ test("returns the duplicate student number message when another member owns it",
 test("routes to profile completion once, then to the student dashboard", () => {
   assert.equal(postLoginPath("STUDENT", false), "/complete-profile");
   assert.equal(postLoginPath("STUDENT", true), "/dashboard");
-  assert.equal(postLoginPath("MENTOR", false), "/mentor");
+  assert.equal(postLoginPath("MENTOR", false), "/mentor/status");
+  assert.equal(postLoginPath("MENTOR", false, "APPROVED"), "/mentor");
   assert.equal(postLoginPath("ADMIN", false), "/admin");
 });

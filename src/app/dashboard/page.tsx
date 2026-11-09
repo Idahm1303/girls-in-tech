@@ -9,21 +9,21 @@ const actions = [
     title: "Choose a Mentor",
     description: "Find guidance and grow with someone who understands your goals.",
     href: "/mentors",
-    button: "Find a mentor",
+    button: "Browse mentors",
   },
   {
     icon: "calendar",
     title: "Browse Events",
     description: "View upcoming events and explore articles from past events.",
     href: "/events",
-    button: "Events library",
+    button: "Browse events",
   },
   {
     icon: "✨",
     title: "Opportunities",
     description: "Explore WIL, learnerships and bursaries for your next step.",
     href: "/opportunities",
-    button: "View opportunities",
+    button: "Browse opportunities",
   },
 ];
 
@@ -43,7 +43,26 @@ async function DashboardContent() {
     <main className="dashboard-page">
       <section className="dashboard-inner" aria-labelledby="dashboard-title">
         <p className="eyebrow">Your GiT community</p>
-        <h1 id="dashboard-title">Hi {member.name}! What would you like to do today?</h1>
+        <h1 id="dashboard-title">
+          Welcome to Girls in Tech, {member.name} {member.surname}
+        </h1>
+        <p className="dashboard-welcome-copy">
+          Your community is ready. Start by exploring these ways to learn,
+          connect, and grow.
+        </p>
+        <section aria-label="Your profile" className="dashboard-profile">
+          <div>
+            <span className="dashboard-profile-label">Student number</span>
+            <strong>{member.studentProfile?.studentNumber}</strong>
+          </div>
+          <div>
+            <span className="dashboard-profile-label">Course</span>
+            <strong>
+              {member.studentProfile?.qualification ?? "Not provided"}
+            </strong>
+          </div>
+        </section>
+        <h2 className="dashboard-journey-title">Your next steps</h2>
         <div className="dashboard-grid">
           {actions.map((action) => (
             <article className="dashboard-card" key={action.href}>

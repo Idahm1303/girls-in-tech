@@ -17,7 +17,13 @@ function SubmitButton() {
   );
 }
 
-export function LoginForm({ initialEmail }: { initialEmail: string }) {
+export function LoginForm({
+  initialEmail,
+  showRegisterLink = true,
+}: {
+  initialEmail: string;
+  showRegisterLink?: boolean;
+}) {
   const [state, formAction] = useActionState(loginAction, initialState);
   const [clientErrors, setClientErrors] = useState<Record<string, string>>({});
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -55,7 +61,7 @@ export function LoginForm({ initialEmail }: { initialEmail: string }) {
         <div className="form-field">
           <label htmlFor="login-email">Email</label>
           <input
-            autoComplete="email"
+            autoComplete="username"
             defaultValue={initialEmail}
             id="login-email"
             name="email"
@@ -103,9 +109,11 @@ export function LoginForm({ initialEmail }: { initialEmail: string }) {
         </div>
         <SubmitButton />
       </form>
-      <p className="account-switch">
-        New here? <Link href="/register">Join GiT</Link>
-      </p>
+      {showRegisterLink && (
+        <p className="account-switch">
+          New here? <Link href="/register">Join GiT</Link>
+        </p>
+      )}
     </>
   );
 }

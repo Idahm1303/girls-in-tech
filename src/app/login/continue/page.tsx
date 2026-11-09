@@ -1,8 +1,7 @@
 import { Suspense } from "react";
-import { auth } from "@/../auth";
 import { redirect } from "next/navigation";
 import { connection } from "next/server";
-import { postLoginPath } from "@/lib/account-routing";
+import { getCurrentMember, postLoginPath } from "@/lib/member-access";
 
 export default function LoginContinuePage() {
   return (
@@ -14,11 +13,14 @@ export default function LoginContinuePage() {
 
 async function ContinueLogin() {
   await connection();
-  const session = await auth();
-
-  if (!session?.user) redirect("/login");
+  const member = await getCurrentMember();
+  if (!member) redirect("/login");
 
   return redirect(
-    postLoginPath(session.user.role, session.user.profileCompleted),
+    postLoginPath(
+      member.role,
+      Boolean(member.studentProfile?.profileCompletedAt),
+      member.mentorProfile?.status,
+    ),
   );
 }

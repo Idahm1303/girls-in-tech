@@ -34,6 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             passwordHash: true,
             role: true,
             studentProfile: { select: { profileCompletedAt: true } },
+            mentorProfile: { select: { status: true } },
           },
         });
 
@@ -51,6 +52,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           role: user.role,
           profileCompleted: Boolean(user.studentProfile?.profileCompletedAt),
+          mentorStatus: user.mentorProfile?.status ?? null,
         };
       },
     }),
@@ -61,6 +63,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role;
         token.surname = user.surname;
         token.profileCompleted = user.profileCompleted;
+        token.mentorStatus = user.mentorStatus;
       }
       return token;
     },
@@ -74,6 +77,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           typeof token.profileCompleted === "boolean"
             ? token.profileCompleted
             : false;
+        session.user.mentorStatus =
+          typeof token.mentorStatus === "string" ? token.mentorStatus : null;
       }
       return session;
     },

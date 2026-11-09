@@ -54,12 +54,19 @@ onboarding test account is `incomplete.student@gmail.com` and uses the same
 password.
 
 These are development/testing credentials only. Never use them in a deployed
-environment. The legacy admin and mentor seed accounts use
-`GirlsInTech2026!`.
+environment. The seeded admin account uses `GirlsInTech2026!`. Seed mentor
+accounts covering pending, approved, rejected, and needs-information states use
+`ChangeMe123!`; the same password is for testing only.
+
+Mentor application email delivery uses Resend. Configure `RESEND_API_KEY`,
+`RESEND_FROM_EMAIL`, and `GIT_ADMIN_EMAIL` in the local environment to send
+application and decision messages. Mentor profile photos are optional and are
+uploaded after a mentor signs in; small images are resized and stored in the
+PostgreSQL `StoredFile` table. Do not upload CVs or PDFs.
 
 ## Account-flow checks
 
-- `npm test` runs validation, duplicate handling, and redirect workflow tests.
+- `npm test` runs student and mentor registration, access, and validation tests.
 - `npm run lint` checks the application.
 - `npm run build` creates the production build.
 
@@ -80,4 +87,5 @@ environment. The legacy admin and mentor seed accounts use
   database such as the Neon production branch.
 - `npm run db:seed` inserts or updates development sample data.
 
-Mentor, events, and opportunities pages are placeholders for a later phase.
+Mentor registration and admin approval are available. Mentor booking requests
+and the mentor-side student directory remain for a later phase.

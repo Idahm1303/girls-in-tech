@@ -974,6 +974,486 @@ summary {
   }
 }
 
+.mentor-registration-card {
+  width: min(100%, 760px);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background: #fff;
+  padding: clamp(1.15rem, 4vw, 2.4rem);
+  box-shadow: 0 16px 50px rgb(75 27 50 / 9%);
+}
+
+.mentor-registration-card h1 {
+  margin: 0.55rem 0 0;
+  color: var(--navy);
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  letter-spacing: -0.055em;
+  line-height: 1.12;
+}
+
+.mentor-registration-form {
+  margin-top: 1.5rem;
+}
+
+.mentor-progress {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: 0 0 1.3rem;
+  padding: 0;
+  list-style: none;
+}
+
+.mentor-progress li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.mentor-progress li > span:first-child {
+  display: grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--periwinkle-soft);
+  color: var(--navy);
+}
+
+.mentor-progress li[aria-current="step"] {
+  color: var(--navy);
+}
+
+.mentor-progress li[aria-current="step"] > span:first-child {
+  background: var(--periwinkle);
+  color: #fff;
+}
+
+.mentor-step {
+  display: grid;
+  min-width: 0;
+  gap: 1.1rem;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+.mentor-step[hidden] {
+  display: none;
+}
+
+.mentor-step > legend {
+  margin-bottom: 0.2rem;
+  color: var(--navy);
+  font-size: 1.1rem;
+  font-weight: 750;
+}
+
+.mentor-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.mentor-choice-group {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 0.9rem;
+}
+
+.mentor-choice-group > legend {
+  padding: 0 0.3rem;
+  color: var(--foreground);
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.mentor-choice-group > label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 1rem;
+  font-size: 0.88rem;
+}
+
+.mentor-choice-group input,
+.mentor-consents input {
+  accent-color: var(--periwinkle);
+}
+
+.mentor-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mentor-chip {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.mentor-chip input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.mentor-chip span {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.55rem 0.75rem;
+  color: var(--foreground);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.mentor-chip input:checked + span {
+  border-color: var(--periwinkle);
+  background: var(--periwinkle-soft);
+  color: var(--navy);
+}
+
+.mentor-chip input:focus-visible + span {
+  outline: 3px solid var(--periwinkle);
+  outline-offset: 2px;
+}
+
+.mentor-availability-row {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, 1fr) repeat(3, auto);
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0;
+  font-size: 0.78rem;
+}
+
+.mentor-availability-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mentor-consents {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.mentor-consents .consent-field {
+  grid-template-columns: 1.2rem minmax(0, 1fr);
+}
+
+.mentor-consents .consent-field a {
+  color: var(--periwinkle-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.mentor-form-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.mentor-form-controls .account-submit {
+  flex: 1 1 220px;
+}
+
+.button-outline-dark {
+  display: inline-flex;
+  min-height: 45px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.65rem 1rem;
+  color: var(--navy);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 750;
+  text-align: center;
+}
+
+.mentor-admin-tabs {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  padding: 0.2rem 0 0.75rem;
+}
+
+.mentor-admin-tabs a {
+  flex: 0 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.6rem 0.85rem;
+  color: var(--navy);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.mentor-admin-tabs a[aria-current="page"] {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: #fff;
+}
+
+.mentor-admin-search {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.mentor-admin-search label {
+  flex-basis: 100%;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.mentor-admin-search input:not([type="hidden"]) {
+  min-height: 42px;
+  flex: 1 1 180px;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+}
+
+.mentor-pagination,
+.mentor-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.mentor-pagination a,
+.admin-mentor-link a {
+  color: var(--periwinkle-ink);
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.mentor-review-actions button {
+  flex: 1 1 180px;
+}
+
+.mentor-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 1.5rem 0;
+}
+
+.mentor-detail-grid > div {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.85rem;
+}
+
+.mentor-detail-grid dt {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.mentor-detail-grid dd {
+  margin: 0.3rem 0 0;
+  overflow-wrap: anywhere;
+  font-size: 0.88rem;
+}
+
+.mentor-detail-grid .mentor-detail-wide {
+  grid-column: 1 / -1;
+}
+
+.mentor-admin-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 0.75rem;
+  object-fit: cover;
+}
+
+.mentor-review-note {
+  margin: 1rem 0;
+  border-left: 4px solid var(--periwinkle);
+  background: var(--periwinkle-soft);
+  padding: 1rem;
+}
+
+.mentor-review-note p {
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+}
+
+.mentor-directory-grid,
+.mentor-placeholder-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.mentor-directory-card {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: #fff;
+  padding: 1.25rem;
+}
+
+.mentor-directory-card h2 {
+  margin: 0.5rem 0 0.25rem;
+  color: var(--navy);
+  font-size: 1.25rem;
+}
+
+.mentor-directory-card p {
+  color: var(--muted);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.mentor-directory-title {
+  margin: 0;
+  font-weight: 700;
+}
+
+.mentor-directory-photo,
+.mentor-profile-photo {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.mentor-photo-placeholder {
+  display: grid;
+  place-items: center;
+  background: var(--periwinkle-soft);
+  color: var(--navy);
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.mentor-profile-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.mentor-profile-summary p {
+  margin-top: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.mentor-edit-panel,
+.mentor-availability {
+  margin-top: 1rem;
+}
+
+.mentor-edit-panel > summary {
+  color: var(--navy);
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.mentor-slot-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.mentor-slot-form > label,
+.mentor-slot-form > button {
+  grid-column: 1 / -1;
+}
+
+.mentor-slot-list {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.1rem;
+  color: var(--muted);
+}
+
+.mentor-policy ul {
+  display: grid;
+  gap: 0.8rem;
+  padding-left: 1.2rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 560px) {
+  .mentor-progress li {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.64rem;
+  }
+
+  .mentor-form-grid,
+  .mentor-detail-grid,
+  .mentor-directory-grid,
+  .mentor-placeholder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mentor-detail-grid .mentor-detail-wide {
+    grid-column: auto;
+  }
+
+  .mentor-slot-form {
+    grid-template-columns: 1fr;
+  }
+
+  .mentor-slot-form > * {
+    grid-column: auto !important;
+  }
+
+  .mentor-availability-row {
+    grid-template-columns: minmax(0, 0.75fr) repeat(3, minmax(0, 1fr));
+    gap: 0.25rem;
+    font-size: 0.68rem;
+  }
+
+  .mentor-availability-row > strong {
+    min-width: 0;
+    font-size: 0.68rem;
+    overflow-wrap: anywhere;
+  }
+
+  .mentor-availability-row label {
+    gap: 0.15rem;
+    white-space: nowrap;
+  }
+
+  .mentor-profile-summary {
+    flex-direction: column;
+  }
+}
+
 .account-page {
   display: flex;
   min-height: 65vh;
@@ -1191,6 +1671,50 @@ summary {
 .dashboard-inner {
   width: min(100%, 1120px);
   margin: 0 auto;
+}
+
+.dashboard-welcome-copy {
+  margin: 0.8rem 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.dashboard-profile {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: #fff;
+  padding: clamp(1.1rem, 3vw, 1.5rem);
+}
+
+.dashboard-profile > div {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.dashboard-profile-label {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dashboard-profile strong {
+  color: var(--navy);
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-journey-title {
+  margin: 2rem 0 0;
+  color: var(--navy);
+  font-size: 1.45rem;
 }
 
 .dashboard-grid {
@@ -1420,6 +1944,7 @@ summary {
 
 .admin-year-filter select {
   min-height: 42px;
+  max-width: 100%;
   border: 1px solid var(--line);
   border-radius: 0.6rem;
   background: #fff;
@@ -1476,7 +2001,7 @@ summary {
 
 .admin-student-card dl {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.75rem;
   margin: 0;
 }
@@ -1491,9 +2016,14 @@ summary {
   margin: 0.25rem 0 0;
   color: var(--foreground);
   font-size: 0.82rem;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 760px) {
+  .dashboard-profile {
+    grid-template-columns: 1fr;
+  }
+
   .admin-students-heading,
   .admin-student-card {
     align-items: stretch;

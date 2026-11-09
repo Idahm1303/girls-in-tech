@@ -25,6 +25,27 @@ enum Campus {
   EMALAHLENI
   POLOKWANE
   GIYANE
+  ONLINE_ONLY
+}
+
+enum MentorApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_INFO
+  SUSPENDED
+}
+
+enum MentorSessionFormat {
+  ONLINE
+  IN_PERSON
+  BOTH
+}
+
+enum MentorMeetingTool {
+  TEAMS
+  ZOOM
+  GOOGLE_MEET
 }
 
 enum SlotStatus {
@@ -73,6 +94,8 @@ enum NotificationType {
   EVENT_RSVP
   EVENT_REMINDER
   OPPORTUNITY_DIGEST
+  MENTOR_APPLICATION
+  MENTOR_STATUS
   GENERAL
 }
 
@@ -100,53 +123,91 @@ model User {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
-  studentProfile     StudentProfile?
-  mentorProfile      MentorProfile?
-  interests          UserInterest[]
-  studentSessions    MentorshipSession[] @relation("SessionStudent")
-  mentorSessions     MentorshipSession[] @relation("SessionMentor")
-  eventRsvps         EventRsvp[]
-  savedOpportunities SavedOpportunity[]
-  notifications      Notification[]
-  attachments        Attachment[]        @relation("AttachmentUploader")
-  authoredPosts      Post[]              @relation("PostAuthor")
-  teamMembership     TeamMember?
+  studentProfile         StudentProfile?
+  mentorProfile          MentorProfile?
+  reviewedMentorProfiles MentorProfile[]     @relation("MentorReviewer")
+  storedFiles            StoredFile[]
+  interests              UserInterest[]
+  studentSessions        MentorshipSession[] @relation("SessionStudent")
+  mentorSessions         MentorshipSession[] @relation("SessionMentor")
+  eventRsvps             EventRsvp[]
+  savedOpportunities     SavedOpportunity[]
+  notifications          Notification[]
+  attachments            Attachment[]        @relation("AttachmentUploader")
+  authoredPosts          Post[]              @relation("PostAuthor")
+  teamMembership         TeamMember?
 
   @@index([role, status])
   @@index([campus])
 }
 
 model StudentProfile {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  studentNumber      String?  @unique
+  id                 String    @id @default(cuid())
+  userId             String    @unique
+  studentNumber      String?   @unique
   campus             Campus?
   qualification      String?
   profileCompletedAt DateTime?
   bio                String?
-  skills             String[] @default([])
+  skills             String[]  @default([])
   cvUrl              String?
   portfolioUrl       String?
   linkedinUrl        String?
   githubUrl          String?
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model MentorProfile {
-  id              String             @id @default(cuid())
-  userId          String             @unique
-  title           String
-  organization    String
-  industry        String
-  yearsExperience Int                @default(0)
-  bio             String
-  profileImageUrl String?
-  isPublished     Boolean            @default(false)
-  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  interests       MentorInterest[]
-  availability    AvailabilitySlot[]
+  id                String                  @id @default(cuid())
+  userId            String                  @unique
+  phone             String                  @default("")
+  jobTitle          String                  @default("")
+  company           String                  @default("")
+  title             String
+  organization      String
+  industry          String
+  yearsExperience   Int                     @default(0)
+  qualification     String                  @default("")
+  isTutAlumna       Boolean                 @default(false)
+  bio               String
+  linkedinUrl       String?
+  photoFileId       String?                 @unique
+  sessionFormat     MentorSessionFormat     @default(BOTH)
+  meetingTool       MentorMeetingTool       @default(TEAMS)
+  campuses          Campus[]                @default([])
+  maxMentees        Int                     @default(1)
+  availabilityNotes String                  @default("")
+  motivation        String                  @default("")
+  consentGivenAt    DateTime?
+  status            MentorApplicationStatus @default(PENDING)
+  createdAt         DateTime                @default(now())
+  reviewedById      String?
+  reviewedAt        DateTime?
+  reviewNote        String?
+  profileImageUrl   String?
+  isPublished       Boolean                 @default(false)
+  user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy        User?                   @relation("MentorReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  photoFile         StoredFile?             @relation("MentorPhoto", fields: [photoFileId], references: [id], onDelete: SetNull)
+  interests         MentorInterest[]
+  availability      AvailabilitySlot[]
 
   @@index([industry, isPublished])
+  @@index([status, createdAt])
+}
+
+model StoredFile {
+  id          String         @id @default(cuid())
+  ownerId     String
+  kind        String
+  mimeType    String
+  size        Int
+  data        Bytes
+  createdAt   DateTime       @default(now())
+  owner       User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  mentorPhoto MentorProfile? @relation("MentorPhoto")
+
+  @@index([ownerId, kind])
 }
 
 model Interest {

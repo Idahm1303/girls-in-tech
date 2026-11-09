@@ -8,6 +8,7 @@ declare module "next-auth" {
       role: UserRole;
       surname: string;
       profileCompleted: boolean;
+      mentorStatus: string | null;
     } & DefaultSession["user"];
   }
 
@@ -15,6 +16,7 @@ declare module "next-auth" {
     role: UserRole;
     surname: string;
     profileCompleted: boolean;
+    mentorStatus: string | null;
   }
 }
 
@@ -23,5 +25,6 @@ declare module "next-auth/jwt" {
     role?: UserRole;
     surname?: string;
     profileCompleted?: boolean;
+    mentorStatus?: string | null;
   }
 }

@@ -1,10 +1,11 @@
-import { PrismaClient, UserRole, AccountStatus, Campus, EventStatus, OpportunityType, TeamRoleTitle, PostStatus } from "@prisma/client";
+import { PrismaClient, UserRole, AccountStatus, Campus, EventStatus, OpportunityType, TeamRoleTitle, PostStatus, MentorApplicationStatus } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { loadEnvConfig } from "@next/env";
 
 loadEnvConfig(process.cwd());
-const prisma = new PrismaClient();
-const passwordHash = await hash("GirlsInTech2026!", 12);
+const prisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL_UNPOOLED,
+});
 
 const interestNames = [
   "Software Development",
@@ -14,12 +15,19 @@ const interestNames = [
   "Entrepreneurship",
   "UX Design",
   "Networking",
+  "Career Growth",
+  "Interview Prep",
+  "CV Review",
 ];
 
 const mentors = [
-  ["Lerato Mokoena", "lerato.mentor@git.tut.ac.za", "Software Engineer", "FinTech", "Software Development"],
-  ["Amara Khumalo", "amara.mentor@git.tut.ac.za", "Security Analyst", "Cybersecurity", "Cybersecurity"],
-  ["Naledi Maseko", "naledi.mentor@git.tut.ac.za", "Cloud Architect", "Cloud Services", "Cloud"],
+  ["Lerato Mokoena", "lerato.mentor@git.tut.ac.za", "Software Engineer", "FinTech", "Software Development", "Software Development", MentorApplicationStatus.APPROVED],
+  ["Amara Khumalo", "amara.mentor@git.tut.ac.za", "Security Analyst", "Cybersecurity", "Cybersecurity", "Cybersecurity", MentorApplicationStatus.APPROVED],
+  ["Naledi Maseko", "naledi.mentor@git.tut.ac.za", "Cloud Architect", "Cloud Services", "Cloud", "Cloud", MentorApplicationStatus.APPROVED],
+  ["Zanele Dlamini", "zanele.approved.mentor@git.tut.ac.za", "Data Scientist", "TUT Research", "Data & AI", "Data & AI", MentorApplicationStatus.APPROVED],
+  ["Palesa Ndlovu", "palesa.pending.mentor@git.tut.ac.za", "UX Designer", "Digital Studio", "UX/UI Design", "UX Design", MentorApplicationStatus.PENDING],
+  ["Thandi Mokoena", "thandi.rejected.mentor@git.tut.ac.za", "Network Engineer", "Connect SA", "Networking & Infrastructure", "Networking", MentorApplicationStatus.REJECTED],
+  ["Kea Molefe", "kea.needs-info.mentor@git.tut.ac.za", "Founder", "TechStart", "Entrepreneurship", "Career Growth", MentorApplicationStatus.NEEDS_INFO],
 ] as const;
 
 const students = [
@@ -51,6 +59,8 @@ function hoursAfter(date: Date, hours: number) {
 }
 
 async function main() {
+  const passwordHash = await hash("GirlsInTech2026!", 12);
+  const mentorPasswordHash = await hash("ChangeMe123!", 12);
   const admin = await prisma.user.upsert({
     where: { email: "admin@git.tut.ac.za" },
     update: { name: "GiT Administrator", passwordHash, role: UserRole.ADMIN, status: AccountStatus.APPROVED },
@@ -78,32 +88,84 @@ async function main() {
 
   const mentorIds: string[] = [];
   for (const [index, mentor] of mentors.entries()) {
-    const [name, email, title, organization, interestName] = mentor;
+    const [fullName, email, title, organization, industry, interestName, mentorStatus] = mentor;
+    const [name, ...surnameParts] = fullName.split(" ");
+    const surname = surnameParts.join(" ");
+    const accountStatus =
+      mentorStatus === MentorApplicationStatus.APPROVED
+        ? AccountStatus.APPROVED
+        : AccountStatus.PENDING;
+    const mentorProfile = {
+      phone: `+271100000${String(index + 1).padStart(2, "0")}`,
+      jobTitle: title,
+      company: organization,
+      title,
+      organization,
+      industry,
+      yearsExperience: 3 + index,
+      qualification: "Bachelor of Technology",
+      isTutAlumna: index % 2 === 0,
+      bio: `I help emerging technologists build confidence and practical skills in ${interestName.toLowerCase()}.`,
+      linkedinUrl: null,
+      sessionFormat: "BOTH" as const,
+      meetingTool: "TEAMS" as const,
+      campuses: [Campus.SOSHANGUVE, Campus.ONLINE_ONLY],
+      maxMentees: 3,
+      availabilityNotes: "Tuesday afternoon, Thursday evening",
+      motivation: "I want to make technology careers more welcoming and accessible to young women.",
+      consentGivenAt: new Date(),
+      status: mentorStatus,
+      reviewedById:
+        mentorStatus === MentorApplicationStatus.PENDING ? null : admin.id,
+      reviewedAt:
+        mentorStatus === MentorApplicationStatus.PENDING ? null : new Date(),
+      reviewNote:
+        mentorStatus === MentorApplicationStatus.REJECTED
+          ? "We are unable to proceed with this application at this time."
+          : mentorStatus === MentorApplicationStatus.NEEDS_INFO
+            ? "Please add more detail about your mentoring availability."
+            : null,
+      isPublished: mentorStatus === MentorApplicationStatus.APPROVED,
+    };
+    const mentorInterests = {
+      create: {
+        interest: {
+          connectOrCreate: {
+            where: { name: interestName },
+            create: { name: interestName },
+          },
+        },
+      },
+    };
     const user = await prisma.user.upsert({
       where: { email },
-      update: { name, passwordHash, role: UserRole.MENTOR, status: AccountStatus.APPROVED },
-      create: {
+      update: {
         name,
-        email,
-        passwordHash,
+        surname,
+        passwordHash: mentorPasswordHash,
         role: UserRole.MENTOR,
-        status: AccountStatus.APPROVED,
-        emailVerifiedAt: new Date(),
-        consentAt: new Date(),
-        campus: "Pretoria",
+        status: accountStatus,
         mentorProfile: {
-          create: {
-            title,
-            organization,
-            industry: organization,
-            yearsExperience: 5 + index,
-            bio: `I help emerging technologists build confidence and practical skills in ${interestName.toLowerCase()}.`,
-            isPublished: true,
-            interests: {
-              create: { interestId: interestByName.get(interestName)! },
+          upsert: {
+            create: { ...mentorProfile, interests: mentorInterests },
+            update: {
+              ...mentorProfile,
+              interests: { deleteMany: {}, ...mentorInterests },
             },
           },
         },
+      },
+      create: {
+        name,
+        surname,
+        email,
+        passwordHash: mentorPasswordHash,
+        role: UserRole.MENTOR,
+        status: accountStatus,
+        emailVerifiedAt: new Date(),
+        consentAt: new Date(),
+        campus: "Pretoria",
+        mentorProfile: { create: { ...mentorProfile, interests: mentorInterests } },
       },
     });
     mentorIds.push(user.id);
@@ -321,7 +383,7 @@ async function main() {
   }
 
   console.log(
-    "Seed complete: admin, 3 mentors, 22 students (16 completed and 1 incomplete onboarding sample), events, opportunities, team, and interests.",
+    "Seed complete: admin, 7 mentors across application statuses, 22 students (16 completed and 1 incomplete onboarding sample), events, opportunities, team, and interests.",
   );
 }
 
