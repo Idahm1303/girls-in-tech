@@ -48,7 +48,7 @@ export const MENTOR_MEETING_TOOLS = ["TEAMS", "ZOOM", "GOOGLE_MEET"] as const;
 
 const emailSchema = z.string().trim().email("Enter a valid email address.").toLowerCase();
 
-export const mentorAccountSchema = z.object({
+const mentorAccountFieldsSchema = z.object({
   name: z.string().trim().min(1, "Enter your name.").max(100),
   surname: z.string().trim().min(1, "Enter your surname.").max(100),
   email: emailSchema,
@@ -60,7 +60,14 @@ export const mentorAccountSchema = z.object({
     .min(7, "Enter a valid cell number.")
     .max(25, "Enter a valid cell number.")
     .regex(/^[+\d() .-]+$/, "Enter a valid cell number."),
-}).superRefine((account, context) => {
+});
+
+export const mentorMemberAccountSchema = mentorAccountFieldsSchema.omit({
+  password: true,
+  confirmPassword: true,
+});
+
+export const mentorAccountSchema = mentorAccountFieldsSchema.superRefine((account, context) => {
   if (account.password !== account.confirmPassword) {
     context.addIssue({
       code: "custom",
@@ -81,10 +88,14 @@ export const mentorProfessionalSchema = z.object({
   isTutAlumna: z.enum(["yes", "no"], { error: "Please select an answer." }),
   bio: z.string().trim().min(20, "Bio must be at least 20 characters.").max(600),
   linkedinUrl: z
-    .union([z.literal(""), z.url("Enter a valid LinkedIn URL.")])
-    .refine((value) => !value || new URL(value).hostname.toLowerCase().includes("linkedin.com"), {
-      message: "Enter a LinkedIn profile URL.",
-    }),
+    .union([
+      z.literal(""),
+      z.url({
+        protocol: /^https?$/,
+        hostname: /^(?:[a-z0-9-]+\.)*linkedin\.com$/i,
+        error: "Enter a valid LinkedIn profile URL.",
+      }),
+    ]),
   expertise: z.array(z.enum(MENTOR_EXPERTISE)).min(1, "Choose at least one area."),
 });
 
@@ -110,6 +121,12 @@ export const mentorPreferencesSchema = z.object({
   }),
 });
 
+const mentorApplicationFieldsSchema = z.object({
+  ...mentorMemberAccountSchema.shape,
+  ...mentorProfessionalSchema.shape,
+  ...mentorPreferencesSchema.shape,
+});
+
 export const mentorRegistrationSchema = z.object({
   ...mentorAccountSchema.shape,
   ...mentorProfessionalSchema.shape,
@@ -122,6 +139,20 @@ export const mentorRegistrationSchema = z.object({
       path: ["confirmPassword"],
     });
   }
+  validateMentorPreferences(fields, context);
+});
+
+export const mentorMemberApplicationSchema = mentorApplicationFieldsSchema.superRefine(
+  validateMentorPreferences,
+);
+
+function validateMentorPreferences(
+  fields: {
+    availability: string[];
+    campuses: (typeof MENTOR_CAMPUS_OPTIONS)[number][];
+  },
+  context: z.RefinementCtx,
+) {
   for (const available of fields.availability) {
     const [day, time] = available.split(" ");
     if (
@@ -136,18 +167,16 @@ export const mentorRegistrationSchema = z.object({
       break;
     }
   }
-  if (
-    fields.campuses.includes("ONLINE_ONLY") &&
-    fields.campuses.length > 1
-  ) {
+  if (fields.campuses.includes("ONLINE_ONLY") && fields.campuses.length > 1) {
     context.addIssue({
       code: "custom",
       message: "Online only cannot be selected with a campus.",
       path: ["campuses"],
     });
   }
-});
+}
 
+export type MentorApplicationFields = z.infer<typeof mentorMemberApplicationSchema>;
 export type MentorRegistrationFields = z.infer<typeof mentorRegistrationSchema>;
 
 export function mentorExperienceYears(band: MentorRegistrationFields["yearsExperience"]) {

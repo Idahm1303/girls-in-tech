@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  mentorMemberApplicationSchema,
   mentorRegistrationSchema,
   MENTOR_EXPERTISE,
 } from "@/lib/mentor-validation";
@@ -60,6 +61,15 @@ test("successfully registers a mentor application", async () => {
   assert.equal(created, true);
 });
 
+test("existing members can submit mentor details without creating another password", () => {
+  const memberApplication = Object.fromEntries(
+    Object.entries(application()).filter(
+      ([field]) => field !== "password" && field !== "confirmPassword",
+    ),
+  );
+  assert.equal(mentorMemberApplicationSchema.safeParse(memberApplication).success, true);
+});
+
 test("rejects a duplicate mentor email", async () => {
   const result = await registerMentor(mentorRegistrationSchema.parse(application()), "hash", {
     async emailExists() {
@@ -80,6 +90,24 @@ test("rejects mismatched mentor passwords", () => {
   if (!result.success) {
     assert.ok(result.error.issues.some((issue) => issue.path[0] === "confirmPassword"));
   }
+});
+
+test("invalid LinkedIn URLs return a validation error instead of throwing", () => {
+  for (const linkedinUrl of [
+    "linkedin.com/in/person",
+    "https://notlinkedin.com/in/person",
+    "https://linkedin.com.evil.example/in/person",
+  ]) {
+    const result = mentorRegistrationSchema.safeParse(application({ linkedinUrl }));
+    assert.equal(result.success, false, `${linkedinUrl} should be rejected`);
+  }
+
+  assert.equal(
+    mentorRegistrationSchema.safeParse(
+      application({ linkedinUrl: "https://www.linkedin.com/in/person" }),
+    ).success,
+    true,
+  );
 });
 
 test("requires at least one mentor expertise area", () => {

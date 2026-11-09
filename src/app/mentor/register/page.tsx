@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
-import { getCurrentMember, postLoginPath } from "@/lib/member-access";
+import { getCurrentMember } from "@/lib/member-access";
 import { MENTOR_EXPERTISE } from "@/lib/mentor-validation";
 import { prisma } from "@/lib/prisma";
 import { MentorRegistrationForm } from "./mentor-registration-form";
@@ -16,13 +16,8 @@ export default function MentorRegistrationPage() {
 
 async function MentorRegistrationContent() {
   await connection();
-  const expertiseOptions = await prisma.interest.findMany({
-    where: { name: { in: [...MENTOR_EXPERTISE] } },
-    orderBy: { name: "asc" },
-    select: { name: true },
-  });
   const member = await getCurrentMember();
-  if (member) {
+  if (member && member.role !== "STUDENT") {
     if (member.role === "MENTOR" && member.mentorProfile?.status === "NEEDS_INFO") {
       return (
         <main className="account-page">
@@ -37,22 +32,27 @@ async function MentorRegistrationContent() {
         </main>
       );
     }
+
     return (
       <main className="account-page">
         <section className="account-card">
-          <p className="eyebrow">Mentor account</p>
-          <h1>You&apos;re already signed in</h1>
+          <p className="eyebrow">{member.role === "MENTOR" ? "Mentor account" : "Admin account"}</p>
+          <h1>{member.role === "MENTOR" ? "You already have a mentor account" : "Admin accounts cannot apply"}</h1>
           <p className="account-intro">
-            Your account is active. <Link href={postLoginPath(
-              member.role,
-              Boolean(member.studentProfile?.profileCompletedAt),
-              member.mentorProfile?.status,
-            )}>Continue to your account</Link>.
+            {member.role === "MENTOR"
+              ? <>View your <Link href="/mentor/status">mentor application status</Link>.</>
+              : <>Sign in with a student account to apply as a mentor.</>}
           </p>
         </section>
       </main>
     );
   }
+
+  const expertiseOptions = await prisma.interest.findMany({
+    where: { name: { in: [...MENTOR_EXPERTISE] } },
+    orderBy: { name: "asc" },
+    select: { name: true },
+  });
 
   return (
     <main className="account-page">
@@ -63,7 +63,14 @@ async function MentorRegistrationContent() {
           Complete the three steps below. Your profile will only appear to GiT
           members after an administrator approves your application.
         </p>
-        <MentorRegistrationForm expertiseOptions={expertiseOptions.map(({ name }) => name)} />
+        <MentorRegistrationForm
+          expertiseOptions={expertiseOptions.map(({ name }) => name)}
+          member={member ? {
+            name: member.name,
+            surname: member.surname,
+            email: member.email,
+          } : undefined}
+        />
       </section>
     </main>
   );

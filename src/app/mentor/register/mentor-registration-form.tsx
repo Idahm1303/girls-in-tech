@@ -12,6 +12,8 @@ import {
   MENTOR_TIME_BANDS,
   MENTOR_WEEKDAYS,
   mentorAccountSchema,
+  mentorMemberAccountSchema,
+  mentorMemberApplicationSchema,
   mentorProfessionalSchema,
   mentorPreferencesSchema,
   mentorRegistrationSchema,
@@ -95,8 +97,10 @@ function formValues(formData: FormData) {
 
 export function MentorRegistrationForm({
   expertiseOptions,
+  member,
 }: {
   expertiseOptions: string[];
+  member?: { name: string; surname: string; email: string };
 }) {
   const [state, formAction] = useActionState(registerMentorAction, initialState);
   const [step, setStep] = useState(0);
@@ -111,7 +115,7 @@ export function MentorRegistrationForm({
     const data = formValues(new FormData(form));
     const parsed =
       currentStep === 0
-        ? mentorAccountSchema.safeParse(data)
+        ? (member ? mentorMemberAccountSchema : mentorAccountSchema).safeParse(data)
         : currentStep === 1
           ? mentorProfessionalSchema.safeParse(data)
           : mentorPreferencesSchema.safeParse(data);
@@ -138,7 +142,7 @@ export function MentorRegistrationForm({
 
   function validateAll(event: FormEvent<HTMLFormElement>) {
     const data = formValues(new FormData(event.currentTarget));
-    const parsed = mentorRegistrationSchema.safeParse(data);
+    const parsed = (member ? mentorMemberApplicationSchema : mentorRegistrationSchema).safeParse(data);
     if (!parsed.success || photoError) {
       event.preventDefault();
       const nextErrors: Record<string, string> = {};
@@ -180,24 +184,51 @@ export function MentorRegistrationForm({
 
       <fieldset className="mentor-step" hidden={step !== 0}>
         <legend>Step 1: Account</legend>
+        {member && (
+          <p className="field-hint">
+            Applying with your existing GiT account. Your student profile will be kept.
+          </p>
+        )}
         <div className="mentor-form-grid">
           <div className="form-field">
             <label htmlFor="mentor-name">Name</label>
-            <input autoComplete="given-name" id="mentor-name" name="name" required />
+            <input
+              autoComplete="given-name"
+              defaultValue={member?.name}
+              id="mentor-name"
+              name="name"
+              readOnly={Boolean(member)}
+              required
+            />
             {currentErrors.name && <p className="field-error">{currentErrors.name}</p>}
           </div>
           <div className="form-field">
             <label htmlFor="mentor-surname">Surname</label>
-            <input autoComplete="family-name" id="mentor-surname" name="surname" required />
+            <input
+              autoComplete="family-name"
+              defaultValue={member?.surname}
+              id="mentor-surname"
+              name="surname"
+              readOnly={Boolean(member)}
+              required
+            />
             {currentErrors.surname && <p className="field-error">{currentErrors.surname}</p>}
           </div>
         </div>
         <div className="form-field">
           <label htmlFor="mentor-email">Email</label>
-          <input autoComplete="email" id="mentor-email" name="email" type="email" required />
+          <input
+            autoComplete="email"
+            defaultValue={member?.email}
+            id="mentor-email"
+            name="email"
+            readOnly={Boolean(member)}
+            required
+            type="email"
+          />
           {currentErrors.email && <p className="field-error">{currentErrors.email}</p>}
         </div>
-        <div className="form-field">
+        {!member && <div className="form-field">
           <label htmlFor="mentor-password">Password</label>
           <div className="password-input-wrap">
             <input
@@ -218,8 +249,8 @@ export function MentorRegistrationForm({
             </button>
           </div>
           {currentErrors.password && <p className="field-error">{currentErrors.password}</p>}
-        </div>
-        <div className="form-field">
+        </div>}
+        {!member && <div className="form-field">
           <label htmlFor="mentor-confirm-password">Confirm password</label>
           <div className="password-input-wrap">
             <input
@@ -239,7 +270,7 @@ export function MentorRegistrationForm({
             </button>
           </div>
           {currentErrors.confirmPassword && <p className="field-error">{currentErrors.confirmPassword}</p>}
-        </div>
+        </div>}
         <div className="form-field">
           <label htmlFor="mentor-phone">Cell number (admin only)</label>
           <input autoComplete="tel" id="mentor-phone" name="phone" type="tel" required />
