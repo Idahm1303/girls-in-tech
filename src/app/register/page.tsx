@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { getCurrentMember, postLoginPath } from "@/lib/member-access";
 import { RegisterForm } from "./register-form";
 
@@ -13,6 +14,7 @@ export default function RegisterPage() {
 }
 
 async function RegisterContent() {
+  await connection();
   const member = await getCurrentMember();
   if (member) {
     redirect(

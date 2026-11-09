@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { auth, signOut } from "@/../auth";
 
 async function logout() {
@@ -7,6 +8,7 @@ async function logout() {
 }
 
 export async function AccountLinks() {
+  await connection();
   const session = await auth();
   if (!session?.user) {
     return (

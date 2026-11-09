@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { welcomeFlashSchema } from "@/lib/account-validation";
 import { getCurrentMember, postLoginPath } from "@/lib/member-access";
 import { LoginForm } from "./login-form";
@@ -14,6 +15,7 @@ export default function LoginPage() {
 }
 
 async function LoginContent() {
+  await connection();
   const member = await getCurrentMember();
   if (member) {
     redirect(

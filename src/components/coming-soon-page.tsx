@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { connection } from "next/server";
 import { requireStudent } from "@/lib/member-access";
 
 export async function ComingSoonPage({ title }: { title: string }) {
+  await connection();
   await requireStudent();
 
   return (

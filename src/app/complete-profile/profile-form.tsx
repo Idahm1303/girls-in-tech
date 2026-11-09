@@ -5,6 +5,8 @@ import { useFormStatus } from "react-dom";
 import { useState } from "react";
 import {
   CAMPUS_OPTIONS,
+  COURSE_OPTIONS,
+  STUDY_YEAR_OPTIONS,
   studentProfileSchema,
   type FormActionState,
 } from "@/lib/account-validation";
@@ -37,6 +39,7 @@ export function ProfileForm() {
     const formData = new FormData(event.currentTarget);
     const parsed = studentProfileSchema.safeParse({
       studentNumber: formData.get("studentNumber"),
+      yearOfStudy: formData.get("yearOfStudy"),
       campus: formData.get("campus"),
       qualification: formData.get("qualification"),
     });
@@ -83,6 +86,31 @@ export function ProfileForm() {
         )}
       </div>
       <div className="form-field">
+        <label htmlFor="year-of-study">Year of study</label>
+        <select
+          defaultValue=""
+          id="year-of-study"
+          name="yearOfStudy"
+          required
+          aria-invalid={Boolean(errors.yearOfStudy)}
+          aria-describedby={errors.yearOfStudy ? "year-of-study-error" : undefined}
+        >
+          <option disabled value="">
+            Select your year of study
+          </option>
+          {STUDY_YEAR_OPTIONS.map((year) => (
+            <option key={year} value={year}>
+              {year === "1" ? "First year" : year === "2" ? "Second year" : "Third year"}
+            </option>
+          ))}
+        </select>
+        {errors.yearOfStudy && (
+          <p className="field-error" id="year-of-study-error">
+            {errors.yearOfStudy}
+          </p>
+        )}
+      </div>
+      <div className="form-field">
         <label htmlFor="campus">Campus</label>
         <select
           defaultValue=""
@@ -109,14 +137,23 @@ export function ProfileForm() {
       </div>
       <div className="form-field">
         <label htmlFor="qualification">Course / qualification you are studying</label>
-        <input
-          autoComplete="organization-title"
+        <select
+          defaultValue=""
           id="qualification"
           name="qualification"
           required
           aria-invalid={Boolean(errors.qualification)}
           aria-describedby={errors.qualification ? "qualification-error" : undefined}
-        />
+        >
+          <option disabled value="">
+            Select your course or qualification
+          </option>
+          {COURSE_OPTIONS.map((course) => (
+            <option key={course} value={course}>
+              {course}
+            </option>
+          ))}
+        </select>
         {errors.qualification && (
           <p className="field-error" id="qualification-error">
             {errors.qualification}

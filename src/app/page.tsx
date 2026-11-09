@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { GitLogo } from "@/components/brand/git-logo";
-import { HashtagBadges } from "@/components/brand/hashtag-badges";
 import { MottoBanner } from "@/components/brand/motto-banner";
-import { TutLogo } from "@/components/brand/tut-logo";
+import { BRAND } from "@/lib/brand";
 
 const highlights = [
   {
@@ -37,9 +36,6 @@ export default function Home() {
         <div className="hero-inner">
           <div className="hero-copy">
             <div className="hero-institution">
-              <span className="hero-institution-logo-panel">
-                <TutLogo className="hero-institution-logo" />
-              </span>
               <p className="eyebrow hero-eyebrow">
                 Tshwane University of Technology
                 <br />
@@ -50,16 +46,16 @@ export default function Home() {
               <GitLogo priority />
               <span>Girls in Tech</span>
             </div>
-            <h1 id="hero-title">
-              Limitless minds.
-              <br />
-              <span>Infinite Code.</span>
+            <h1 aria-label={BRAND.hashtags.join(", ")} id="hero-title">
+              {BRAND.hashtags.map((hashtag) => (
+                <span key={hashtag}>{hashtag}</span>
+              ))}
             </h1>
+            <MottoBanner className="hero-motto" />
             <p className="hero-description">
               A community for women in technology to learn boldly, find their
               people, and shape what comes next.
             </p>
-            <HashtagBadges className="hero-hashtags" />
             <div className="hero-actions">
               <Link className="button button-light" href="/register">
                 Join GiT <span aria-hidden="true">↗</span>
@@ -105,7 +101,6 @@ export default function Home() {
             <br />
             <span>starts here.</span>
           </h2>
-          <MottoBanner className="welcome-motto" />
         </div>
         <div className="highlight-grid">
           {highlights.map((item) => (

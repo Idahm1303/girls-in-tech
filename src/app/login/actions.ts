@@ -1,14 +1,12 @@
 "use server";
 
-import { compare } from "bcryptjs";
+import { CredentialsSignin } from "next-auth";
 import { redirect } from "next/navigation";
 import { signIn } from "@/../auth";
 import {
   loginSchema,
   type FormActionState,
 } from "@/lib/account-validation";
-import { postLoginPath } from "@/lib/member-access";
-import { prisma } from "@/lib/prisma";
 
 function firstFieldErrors(error: {
   issues: Array<{ path: PropertyKey[]; message: string }>;
@@ -32,32 +30,18 @@ export async function loginAction(
 
   if (!parsed.success) return { errors: firstFieldErrors(parsed.error) };
 
-  const user = await prisma.user.findFirst({
-    where: { email: { equals: parsed.data.email, mode: "insensitive" } },
-    select: {
-      email: true,
-      passwordHash: true,
-      role: true,
-      studentProfile: { select: { profileCompletedAt: true } },
-    },
-  });
-
-  if (
-    !user?.passwordHash ||
-    !(await compare(parsed.data.password, user.passwordHash))
-  ) {
-    return { message: "Email or password is incorrect. Please try again." };
+  try {
+    await signIn("credentials", {
+      email: parsed.data.email,
+      password: parsed.data.password,
+      redirectTo: "/login/continue",
+    });
+  } catch (error) {
+    if (error instanceof CredentialsSignin) {
+      return { message: "Email or password is incorrect. Please try again." };
+    }
+    throw error;
   }
 
-  const redirectTo = postLoginPath(
-    user.role,
-    Boolean(user.studentProfile?.profileCompletedAt),
-  );
-  await signIn("credentials", {
-    email: user.email,
-    password: parsed.data.password,
-    redirectTo,
-  });
-
-  redirect(redirectTo);
+  redirect("/login/continue");
 }

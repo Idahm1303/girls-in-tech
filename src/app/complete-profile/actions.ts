@@ -33,6 +33,7 @@ export async function completeProfileAction(
 
   const parsed = studentProfileSchema.safeParse({
     studentNumber: formData.get("studentNumber"),
+    yearOfStudy: formData.get("yearOfStudy"),
     campus: formData.get("campus"),
     qualification: formData.get("qualification"),
   });
@@ -49,11 +50,18 @@ export async function completeProfileAction(
       );
     },
     async updateStudentProfile(userId, input) {
-      await prisma.studentProfile.upsert({
-        where: { userId },
-        create: { userId, ...input },
-        update: input,
-      });
+      const { yearOfStudy, ...profile } = input;
+      await prisma.$transaction([
+        prisma.studentProfile.upsert({
+          where: { userId },
+          create: { userId, ...profile },
+          update: profile,
+        }),
+        prisma.user.update({
+          where: { id: userId },
+          data: { yearOfStudy },
+        }),
+      ]);
     },
   });
 

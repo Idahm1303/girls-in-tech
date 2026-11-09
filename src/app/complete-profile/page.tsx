@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { getCurrentMember, roleHome } from "@/lib/member-access";
 import { ProfileForm } from "./profile-form";
 
@@ -12,6 +13,7 @@ export default function CompleteProfilePage() {
 }
 
 async function CompleteProfileContent() {
+  await connection();
   const member = await getCurrentMember();
   if (!member) redirect("/login");
   if (member.role !== "STUDENT") redirect(roleHome[member.role]);

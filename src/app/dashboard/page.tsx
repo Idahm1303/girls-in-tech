@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { connection } from "next/server";
 import { requireStudent } from "@/lib/member-access";
 
 const actions = [
@@ -11,11 +12,11 @@ const actions = [
     button: "Find a mentor",
   },
   {
-    icon: "📅",
+    icon: "calendar",
     title: "Browse Events",
-    description: "Meet your community and take part in what’s happening at GiT.",
+    description: "View upcoming events and explore articles from past events.",
     href: "/events",
-    button: "Explore events",
+    button: "Events library",
   },
   {
     icon: "✨",
@@ -35,6 +36,7 @@ export default function DashboardPage() {
 }
 
 async function DashboardContent() {
+  await connection();
   const member = await requireStudent();
 
   return (
@@ -46,7 +48,32 @@ async function DashboardContent() {
           {actions.map((action) => (
             <article className="dashboard-card" key={action.href}>
               <span aria-hidden="true" className="dashboard-icon">
-                {action.icon}
+                {action.icon === "calendar" ? (
+                  <svg
+                    aria-hidden="true"
+                    className="dashboard-event-icon"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <rect
+                      height="17"
+                      rx="2.5"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      width="18"
+                      x="3"
+                      y="4.5"
+                    />
+                    <path
+                      d="M8 2.75v3.5M16 2.75v3.5M3 9.5h18M8 13h3m-3 4h3m3-4h3m-3 4h3"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeWidth="1.8"
+                    />
+                  </svg>
+                ) : (
+                  action.icon
+                )}
               </span>
               <h2>{action.title}</h2>
               <p>{action.description}</p>

@@ -16,7 +16,7 @@ export default function OpenGraphImage() {
           alignItems: "center",
           justifyContent: "space-between",
           overflow: "hidden",
-          backgroundColor: "#1B2A6B",
+          backgroundColor: "#511735",
           color: "#FFFFFF",
           padding: "72px 84px",
           fontFamily: "Arial",
@@ -57,12 +57,12 @@ export default function OpenGraphImage() {
           >
             Limitless minds.
             <br />
-            <span style={{ color: "#DBDAFA" }}>Infinite Code.</span>
+            <span style={{ color: "#FFD8E8" }}>Infinite Code.</span>
           </div>
           <div
             style={{
               marginTop: "34px",
-              color: "#DBE0F5",
+              color: "#F9E8EF",
               fontSize: "24px",
             }}
           >

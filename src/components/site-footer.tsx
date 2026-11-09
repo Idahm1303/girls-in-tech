@@ -2,7 +2,6 @@ import Link from "next/link";
 import { GitLogo } from "@/components/brand/git-logo";
 import { HashtagBadges } from "@/components/brand/hashtag-badges";
 import { MottoBanner } from "@/components/brand/motto-banner";
-import { TutLogo } from "@/components/brand/tut-logo";
 import { BRAND } from "@/lib/brand";
 
 export function SiteFooter() {
@@ -17,10 +16,7 @@ export function SiteFooter() {
           <HashtagBadges className="footer-hashtags" />
         </div>
 
-        <div className="footer-tut">
-          <div className="tut-logo-panel">
-            <TutLogo className="tut-logo-image" />
-          </div>
+        <div className="footer-institution">
           <p>{BRAND.institution}</p>
         </div>
 

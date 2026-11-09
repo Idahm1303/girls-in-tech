@@ -4,6 +4,8 @@ import {
   DUPLICATE_EMAIL_ERROR,
   DUPLICATE_STUDENT_NUMBER_ERROR,
   EMAIL_DOMAIN_ERROR,
+  COURSE_OPTIONS,
+  STUDY_YEAR_OPTIONS,
   registrationSchema,
   STUDENT_NUMBER_ERROR,
   studentProfileSchema,
@@ -58,12 +60,54 @@ test("rejects student numbers with incorrect length or non-digits", () => {
   for (const studentNumber of ["12345678", "1234567890", "12345678a"]) {
     const result = studentProfileSchema.safeParse({
       studentNumber,
+      yearOfStudy: "1",
       campus: "SOSHANGUVE",
-      qualification: "Diploma in ICT",
+      qualification: "Information Technology",
     });
     assert.equal(result.success, false, `accepted ${studentNumber}`);
     if (!result.success) assert.equal(result.error.issues[0]?.message, STUDENT_NUMBER_ERROR);
   }
+});
+
+test("accepts only the listed course and qualification options", () => {
+  for (const qualification of COURSE_OPTIONS) {
+    const result = studentProfileSchema.safeParse({
+      studentNumber: "123456789",
+      yearOfStudy: "1",
+      campus: "SOSHANGUVE",
+      qualification,
+    });
+    assert.equal(result.success, true, `rejected ${qualification}`);
+  }
+
+  const result = studentProfileSchema.safeParse({
+    studentNumber: "123456789",
+    yearOfStudy: "1",
+    campus: "SOSHANGUVE",
+    qualification: "Diploma in ICT",
+  });
+  assert.equal(result.success, false);
+});
+
+test("accepts only first, second, and third year and converts the selection to a number", () => {
+  for (const year of STUDY_YEAR_OPTIONS) {
+    const result = studentProfileSchema.safeParse({
+      studentNumber: "123456789",
+      yearOfStudy: year,
+      campus: "SOSHANGUVE",
+      qualification: "Information Technology",
+    });
+    assert.equal(result.success, true);
+    if (result.success) assert.equal(result.data.yearOfStudy, Number(year));
+  }
+
+  const result = studentProfileSchema.safeParse({
+    studentNumber: "123456789",
+    yearOfStudy: "4",
+    campus: "SOSHANGUVE",
+    qualification: "Information Technology",
+  });
+  assert.equal(result.success, false);
 });
 
 test("returns the duplicate email message for a registered address", async () => {
@@ -90,8 +134,9 @@ test("returns the duplicate student number message when another member owns it",
   const registeredNumbers = new Map<string, string>();
   const input = studentProfileSchema.parse({
     studentNumber: "123456789",
+    yearOfStudy: "2",
     campus: "EMALAHLENI",
-    qualification: "Diploma in ICT",
+    qualification: "Information Technology",
   });
   const repository = {
     async studentNumberExists(studentNumber: string, exceptUserId: string) {

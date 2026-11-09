@@ -19,6 +19,16 @@ export const CAMPUS_OPTIONS = [
   "GIYANE",
 ] as const;
 
+export const COURSE_OPTIONS = [
+  "Computer Science",
+  "Computer System Engineering",
+  "Information Technology",
+  "Informatics",
+  "Multimedia",
+] as const;
+
+export const STUDY_YEAR_OPTIONS = ["1", "2", "3"] as const;
+
 const emailSchema = z
   .string()
   .trim()
@@ -58,8 +68,13 @@ export const loginSchema = z.object({
 
 export const studentProfileSchema = z.object({
   studentNumber: z.string().regex(/^\d{9}$/, STUDENT_NUMBER_ERROR),
+  yearOfStudy: z.enum(STUDY_YEAR_OPTIONS, {
+    error: "Select your year of study.",
+  }).transform(Number),
   campus: z.enum(CAMPUS_OPTIONS, { error: "Select your campus." }),
-  qualification: z.string().trim().min(1, "Enter your course or qualification."),
+  qualification: z.enum(COURSE_OPTIONS, {
+    error: "Select your course or qualification.",
+  }),
 });
 
 export const welcomeFlashSchema = z.object({

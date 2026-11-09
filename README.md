@@ -65,10 +65,10 @@ environment. The legacy admin and mentor seed accounts use
 
 ## Brand assets
 
-- TUT logo: `public/brand/tut_logo.png`.
+- The institutional logo is omitted until the approved corporate logo is provided.
 - GiT infinity mark: `public/brand/git-infinity.svg`.
 - GiT motto: “Limitless minds. Infinite Code.”
-- Periwinkle and navy brand colors: `#7B7FB5` and `#1B2A6B`.
+- Pink and plum brand colors: `#C0266D` and `#642044`.
 - Brand motto, hashtags, and logo paths live in `src/lib/brand.ts`.
 
 ## Database commands

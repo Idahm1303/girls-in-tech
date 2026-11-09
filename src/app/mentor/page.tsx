@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import { requireRole } from "@/lib/member-access";
 
 export default function MentorHomePage() {
@@ -10,6 +11,7 @@ export default function MentorHomePage() {
 }
 
 async function MentorContent() {
+  await connection();
   const member = await requireRole("MENTOR");
   return (
     <main className="dashboard-page">
