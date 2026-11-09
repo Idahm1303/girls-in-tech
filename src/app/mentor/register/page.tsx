@@ -3,7 +3,6 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { getCurrentMember } from "@/lib/member-access";
 import { MENTOR_EXPERTISE } from "@/lib/mentor-validation";
-import { prisma } from "@/lib/prisma";
 import { MentorRegistrationForm } from "./mentor-registration-form";
 
 export default function MentorRegistrationPage() {
@@ -48,12 +47,6 @@ async function MentorRegistrationContent() {
     );
   }
 
-  const expertiseOptions = await prisma.interest.findMany({
-    where: { name: { in: [...MENTOR_EXPERTISE] } },
-    orderBy: { name: "asc" },
-    select: { name: true },
-  });
-
   return (
     <main className="account-page">
       <section className="mentor-registration-card" aria-labelledby="mentor-register-title">
@@ -64,7 +57,7 @@ async function MentorRegistrationContent() {
           members after an administrator approves your application.
         </p>
         <MentorRegistrationForm
-          expertiseOptions={expertiseOptions.map(({ name }) => name)}
+          expertiseOptions={[...MENTOR_EXPERTISE]}
           member={member ? {
             name: member.name,
             surname: member.surname,
