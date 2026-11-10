@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { GitLogo } from "@/components/brand/git-logo";
 import { MottoBanner } from "@/components/brand/motto-banner";
+import { TutLogo } from "@/components/brand/tut-logo";
 import { BRAND } from "@/lib/brand";
 
 const highlights = [
@@ -36,14 +37,10 @@ export default function Home() {
         <div className="hero-inner">
           <div className="hero-copy">
             <div className="hero-institution">
-              <p className="eyebrow hero-eyebrow">
-                Tshwane University of Technology
-                <br />
-                Faculty of ICT
-              </p>
+              <TutLogo className="hero-tut-logo" loading="eager" />
             </div>
             <div className="hero-logo">
-              <GitLogo priority />
+              <GitLogo loading="eager" />
               <span>Girls in Tech</span>
             </div>
             <h1 aria-label={BRAND.hashtags.join(", ")} id="hero-title">

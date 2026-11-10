@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fffafd;
-  --foreground: #321827;
-  --periwinkle: #c0266d;
-  --navy: #642044;
-  --periwinkle-ink: #92204f;
-  --periwinkle-soft: #fff0f6;
-  --lavender: #f7c4d9;
-  --muted: #765a68;
-  --line: #f0d7e2;
+  --background: #fbfcfe;
+  --foreground: #1f2c3a;
+  --periwinkle: #c8102e;
+  --navy: #003b70;
+  --periwinkle-ink: #a30c28;
+  --periwinkle-soft: #fff1f2;
+  --lavender: #f6d2d8;
+  --accent-gold: #f2a900;
+  --muted: #5b6875;
+  --line: #dfe5eb;
 }
 
 @theme inline {
@@ -120,6 +121,21 @@ summary {
   letter-spacing: -0.035em;
 }
 
+.header-affiliation {
+  display: flex;
+  height: 36px;
+  align-items: center;
+  margin-left: auto;
+  margin-right: 0.8rem;
+  border-left: 1px solid var(--line);
+  padding-left: 1rem;
+}
+
+.header-tut-logo {
+  width: 112px;
+  height: auto;
+}
+
 .desktop-nav {
   display: flex;
   align-items: center;
@@ -173,8 +189,8 @@ summary {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(ellipse at 82% 55%, rgb(229 87 148 / 42%), transparent 37%),
-    linear-gradient(118deg, #511735 0%, #81234e 56%, #a83267 100%);
+    radial-gradient(ellipse at 82% 55%, rgb(200 16 46 / 25%), transparent 37%),
+    linear-gradient(118deg, #102d4a 0%, #124b78 58%, #153b60 100%);
   color: #fff;
 }
 
@@ -207,12 +223,19 @@ summary {
 }
 
 .hero-institution {
+  display: inline-flex;
+  align-items: center;
   margin-bottom: 1.6rem;
+  border: 1px solid rgb(255 255 255 / 84%);
+  border-radius: 0.6rem;
+  background: #fff;
+  padding: 0.45rem 0.7rem;
+  box-shadow: 0 8px 24px rgb(7 31 52 / 18%);
 }
 
-.hero-eyebrow {
-  margin-bottom: 0;
-  color: #f5c8dc;
+.hero-tut-logo {
+  width: 166px;
+  height: auto;
 }
 
 .hero-logo {
@@ -240,12 +263,12 @@ summary {
 
 .hero h1 span {
   display: block;
-  color: #ffd8e8;
+  color: var(--accent-gold);
 }
 
 .hero-motto {
   margin: 0.7rem 0 0;
-  color: #f9e8ef;
+  color: #eef4fa;
   font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -254,7 +277,7 @@ summary {
 .hero-description {
   max-width: 510px;
   margin: 1rem 0 1.2rem;
-  color: #f9e8ef;
+  color: #eef4fa;
   font-size: clamp(1rem, 1.5vw, 1.13rem);
   line-height: 1.8;
 }
@@ -345,7 +368,7 @@ summary {
   width: min(80%, 360px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(255 170 203 / 34%), transparent 69%);
+  background: radial-gradient(circle, rgb(242 169 0 / 20%), transparent 69%);
   filter: blur(7px);
 }
 
@@ -390,7 +413,7 @@ summary {
 
 .art-logo-card span,
 .art-caption {
-  color: #ffe4ef;
+  color: #fff4d6;
   font-size: 0.59rem;
   font-weight: 800;
   letter-spacing: 0.18em;
@@ -425,7 +448,7 @@ summary {
   bottom: 34%;
   width: 8px;
   height: 8px;
-  background: #ff9fbd;
+  background: var(--periwinkle);
 }
 
 .art-caption {
@@ -652,7 +675,7 @@ summary {
 }
 
 .site-footer {
-  background: #511735;
+  background: #102d4a;
   color: #fff;
 }
 
@@ -692,21 +715,45 @@ summary {
 .footer-hashtags .hashtag-badge {
   border-color: rgb(255 255 255 / 15%);
   background: rgb(255 255 255 / 6%);
-  color: #f9e8ef;
+  color: #e7eef5;
   font-size: 0.62rem;
   padding: 0.38rem 0.58rem;
 }
 
 .footer-institution {
   align-self: center;
-  color: #f9e8ef;
+  color: #e7eef5;
+}
+
+.footer-tut-card {
+  display: inline-flex;
+  max-width: 190px;
+  align-items: center;
+  border-radius: 0.55rem;
+  background: #fff;
+  padding: 0.4rem 0.55rem;
+}
+
+.footer-tut-logo {
+  width: 170px;
+  height: auto;
 }
 
 .footer-institution p {
   max-width: 250px;
-  margin: 0;
+  margin: 0.8rem 0 0;
   font-size: 0.78rem;
   line-height: 1.6;
+}
+
+.footer-pdf-link {
+  display: inline-block;
+  margin-top: 0.7rem;
+  color: var(--accent-gold);
+  font-size: 0.75rem;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 .footer-links {
@@ -714,7 +761,7 @@ summary {
   flex-direction: column;
   justify-content: center;
   gap: 0.8rem;
-  color: #f9e8ef;
+  color: #e7eef5;
   font-size: 0.81rem;
   font-weight: 550;
 }
@@ -727,7 +774,7 @@ summary {
   margin: 0 auto;
   border-top: 1px solid rgb(255 255 255 / 15%);
   padding: 1.1rem 0 1.3rem;
-  color: #e7c1d1;
+  color: #bdcbd8;
   font-size: 0.69rem;
 }
 
@@ -736,9 +783,12 @@ summary {
     height: 72px;
   }
 
-  .brand-name,
   .desktop-nav {
     display: none;
+  }
+
+  .header-tut-logo {
+    width: 100px;
   }
 
   .brand-mark {
@@ -914,11 +964,6 @@ summary {
 
   .hero-inner {
     padding-top: 3.3rem;
-  }
-
-  .hero-eyebrow {
-    max-width: 300px;
-    font-size: 0.61rem;
   }
 
   .hero h1 {
@@ -1664,7 +1709,7 @@ summary {
 
 .dashboard-page {
   min-height: 65vh;
-  background: #fff5f9;
+  background: var(--background);
   padding: clamp(2.5rem, 7vw, 5.5rem) 1rem;
 }
 
@@ -1749,7 +1794,7 @@ summary {
 .dashboard-event-icon {
   width: 1.8rem;
   height: 1.8rem;
-  color: var(--pink-ink);
+  color: var(--periwinkle-ink);
 }
 
 .dashboard-card h2 {
@@ -1777,7 +1822,7 @@ summary {
 
 .events-page {
   min-height: 65vh;
-  background: #fff5f9;
+  background: var(--background);
   padding: clamp(2.5rem, 7vw, 5rem) 1rem;
 }
 
@@ -1853,7 +1898,7 @@ summary {
 
 .event-date {
   margin: 0;
-  color: var(--pink-ink);
+  color: var(--periwinkle-ink);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -1883,7 +1928,7 @@ summary {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  color: var(--pink-ink);
+  color: var(--periwinkle-ink);
   font-size: 0.88rem;
   font-weight: 750;
   text-decoration: underline;
@@ -1896,9 +1941,9 @@ summary {
 
 .events-empty {
   margin: 0;
-  border: 1px dashed #e6b7cd;
+  border: 1px dashed var(--line);
   border-radius: 1rem;
-  background: #fffafd;
+  background: var(--background);
   padding: 2rem;
   color: var(--muted);
   text-align: center;
@@ -1960,7 +2005,7 @@ summary {
 }
 
 .admin-year-filter > a {
-  color: var(--pink-ink);
+  color: var(--periwinkle-ink);
   font-size: 0.82rem;
   font-weight: 700;
   text-decoration: underline;
@@ -2055,9 +2100,97 @@ summary {
 .team-page {
   min-height: 65vh;
   background:
-    radial-gradient(ellipse at 50% 0%, rgb(247 196 217 / 40%), transparent 48%),
-    #fffafd;
+    radial-gradient(ellipse at 50% 0%, rgb(242 169 0 / 10%), transparent 48%),
+    var(--background);
   padding: clamp(2.5rem, 7vw, 5rem) 1rem;
+}
+
+.contact-page {
+  min-height: 65vh;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgb(242 169 0 / 10%), transparent 48%),
+    var(--background);
+  padding: clamp(2.5rem, 7vw, 5rem) 1rem;
+}
+
+.contact-inner {
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+
+.contact-inner > h1 {
+  margin: 0.6rem 0 0;
+  color: var(--navy);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: -0.06em;
+}
+
+.contact-intro {
+  margin: 0.75rem 0 2rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.contact-card {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: #fff;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  box-shadow: 0 12px 32px rgb(75 27 50 / 7%);
+}
+
+.contact-card h2 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 1.2rem;
+}
+
+.contact-name {
+  margin: 0.4rem 0 1.5rem;
+  color: var(--muted);
+}
+
+.contact-details {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+}
+
+.contact-details dt {
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.contact-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.contact-details a,
+.contact-social-links a {
+  color: var(--periwinkle-ink);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.contact-card h3 {
+  margin: 1.75rem 0 0.75rem;
+  color: var(--navy);
+  font-size: 1rem;
+}
+
+.contact-social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .team-inner {
@@ -2096,21 +2229,16 @@ summary {
 }
 
 .team-member-card {
+  width: min(100%, 300px);
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 1.2rem;
-  background: #fff;
-  box-shadow: 0 12px 32px rgb(75 27 50 / 7%);
 }
 
 .team-member-card-featured {
-  width: min(100%, 380px);
-  border-color: #e9c2d2;
-  box-shadow: 0 16px 40px rgb(100 32 68 / 12%);
+  width: min(100%, 300px);
 }
 
 .team-member-copy {
-  padding: 1.2rem 1.3rem 0.7rem;
+  padding: 0 0 0.85rem;
 }
 
 .team-member-role {
@@ -2131,50 +2259,20 @@ summary {
 
 .team-member-photo {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1;
   overflow: hidden;
   margin: 0;
-  background: linear-gradient(135deg, #f8d9e5, #fff1f6);
-}
-
-.team-member-card-featured .team-member-photo {
-  aspect-ratio: 4 / 3.4;
 }
 
 .team-member-photo img {
   object-fit: cover;
-  object-position: center 35%;
-}
-
-.team-photo-fallback {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  color: var(--muted);
-  font-size: 0.8rem;
-  font-weight: 650;
-}
-
-.team-photo-fallback span:first-child {
-  display: grid;
-  width: 4rem;
-  aspect-ratio: 1;
-  place-items: center;
-  border: 1px solid rgb(100 32 68 / 14%);
-  border-radius: 50%;
-  background: rgb(255 255 255 / 68%);
-  color: var(--navy);
-  font-size: 1.2rem;
-  font-weight: 800;
+  object-position: center;
 }
 
 .team-co-leads-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: center;
   gap: 1.2rem;
 }
 

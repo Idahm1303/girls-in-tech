@@ -10,26 +10,21 @@ const coLeads = [
   {
     name: "Idah Mokwena",
     role: "Co-Lead Organiser",
-    initials: "IM",
-    imageSrc: "/team/idah-mokwena.png",
+    imageSrc: "/team/idah-mokwena.jfif",
   },
   {
     name: "Refiloe Mthethwa",
     role: "Co-Lead Organiser",
-    initials: "RM",
-    imageSrc: "/team/refiloe-mthethwa.jpg",
+    imageSrc: "/team/refiloe-mthethwa.jfif",
   },
   {
     name: "Tshegofatso Letsoalo",
     role: "Co-Lead Organiser",
-    initials: "TL",
-    imageSrc: "/team/tshegofatso-letsoalo.jpg",
   },
   {
     name: "Kgothatso Monono",
     role: "Girls in Tech Journalist",
-    initials: "KM",
-    imageSrc: "/team/kgothatso-monono.jpg",
+    imageSrc: "/team/kgothatso-monono.jfif",
   },
 ];
 
@@ -48,8 +43,7 @@ export default function TeamPage() {
           <h2 className="team-section-title" id="lead-organiser-title">Lead organiser</h2>
           <TeamMemberCard
             featured
-            imageSrc="/team/thembeka-manetje.jpg"
-            initials="TM"
+            imageSrc="/team/dr-thembeka-manetje.jfif"
             name="Dr Thembeka Manetje"
             role="Lead Organiser"
           />
@@ -61,10 +55,9 @@ export default function TeamPage() {
             {coLeads.map((member) => (
               <TeamMemberCard
                 imageSrc={member.imageSrc}
-                initials={member.initials}
                 key={member.name}
                 name={member.name}
-                role={member.role ?? "Co-Lead Organiser"}
+                role={member.role}
               />
             ))}
           </div>

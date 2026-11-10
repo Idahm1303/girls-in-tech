@@ -6,5 +6,8 @@ export const BRAND = {
   hashtags: ["#InfinitePotential", "#GirlCoders", "#ICTGIRLS"],
   logo: {
     git: "/brand/git-infinity.svg",
+    tutWordmark: "/brand/tut-wordmark.png",
+    tutBlack: "/brand/tut-logo-black.png",
+    tutPdf: "/brand/tut-logo.pdf",
   },
 } as const;

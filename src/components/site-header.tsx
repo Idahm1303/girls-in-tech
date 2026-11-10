@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { GitLogo } from "@/components/brand/git-logo";
+import { TutLogo } from "@/components/brand/tut-logo";
 import { AccountLinks } from "@/components/account-links";
 
 const navigation = [
@@ -16,10 +17,13 @@ export function SiteHeader() {
       <div className="header-inner">
         <Link aria-label="Girls in Tech home" className="brand-lockup" href="/">
           <span className="brand-mark">
-            <GitLogo priority />
+            <GitLogo loading="eager" />
           </span>
           <span className="brand-name">Girls in Tech</span>
         </Link>
+        <span className="header-affiliation">
+          <TutLogo className="header-tut-logo" loading="eager" />
+        </span>
 
         <details className="mobile-menu">
           <summary aria-label="Open navigation menu">

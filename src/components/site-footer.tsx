@@ -2,6 +2,7 @@ import Link from "next/link";
 import { GitLogo } from "@/components/brand/git-logo";
 import { HashtagBadges } from "@/components/brand/hashtag-badges";
 import { MottoBanner } from "@/components/brand/motto-banner";
+import { TutLogo } from "@/components/brand/tut-logo";
 import { BRAND } from "@/lib/brand";
 
 export function SiteFooter() {
@@ -17,7 +18,18 @@ export function SiteFooter() {
         </div>
 
         <div className="footer-institution">
+          <div className="footer-tut-card">
+            <TutLogo className="footer-tut-logo" />
+          </div>
           <p>{BRAND.institution}</p>
+          <a
+            className="footer-pdf-link"
+            href={BRAND.logo.tutPdf}
+            rel="noreferrer"
+            target="_blank"
+          >
+            High-resolution TUT logo (PDF)
+          </a>
         </div>
 
         <nav aria-label="Footer navigation" className="footer-links">
