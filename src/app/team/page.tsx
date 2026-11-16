@@ -15,7 +15,7 @@ const coLeads = [
   {
     name: "Refiloe Mthethwa",
     role: "Co-Lead Organiser",
-    imageSrc: "/team/refiloe-mthethwa.jfif",
+    imageSrc: "/team/refiloe-mthethwa-full-face-v2.jpg",
   },
   {
     name: "Tshegofatso Letsoalo",
@@ -43,8 +43,9 @@ export default function TeamPage() {
           <h2 className="team-section-title" id="lead-organiser-title">Lead organiser</h2>
           <TeamMemberCard
             featured
-            imageSrc="/team/dr-thembeka-manetje.jfif"
+            imageSrc="/team/dr-thembeka-manetje.jpg"
             name="Dr Thembeka Manetje"
+            portraitFraming="chin-clearance"
             role="Lead Organiser"
           />
         </section>
@@ -57,6 +58,7 @@ export default function TeamPage() {
                 imageSrc={member.imageSrc}
                 key={member.name}
                 name={member.name}
+                portraitFraming={member.name === "Refiloe Mthethwa" ? "chin-clearance" : "default"}
                 role={member.role}
               />
             ))}

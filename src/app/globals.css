@@ -2171,11 +2171,56 @@ summary {
 }
 
 .contact-details a,
-.contact-social-links a {
+.contact-social-links a,
+.contact-whatsapp-link {
   color: var(--periwinkle-ink);
   font-weight: 650;
   text-decoration: underline;
   text-underline-offset: 0.2em;
+}
+
+.contact-social-links a,
+.contact-whatsapp-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.social-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
+}
+
+.social-icon-facebook {
+  color: #1877f2;
+}
+
+.social-icon-x {
+  color: #000;
+}
+
+.contact-social-links {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-social-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border-radius: 0.4rem;
+  padding: 0.55rem 0.6rem;
+  text-decoration: none;
+}
+
+.contact-social-links a:hover,
+.contact-social-links a:focus-visible {
+  background: var(--periwinkle-soft);
+  outline: none;
 }
 
 .contact-card h3 {
@@ -2262,6 +2307,25 @@ summary {
   aspect-ratio: 1;
   overflow: hidden;
   margin: 0;
+}
+
+.team-member-photo-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.team-member-photo-chin-clearance {
+  display: grid;
+  aspect-ratio: 5 / 6;
+  place-items: center;
+  background: var(--periwinkle-soft);
+}
+
+.team-member-photo-chin-clearance .team-member-photo-viewport {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 5 / 6;
 }
 
 .team-member-photo img {
