@@ -8,10 +8,11 @@ if (process.env.NODE_ENV === "production") {
     "The sample seed is development-only. Use npm run db:seed:admin to provision a production administrator.",
   );
 }
-const directDatabaseUrl =
-  process.env.DIRECT_URL ?? process.env.DATABASE_URL_UNPOOLED;
+const directDatabaseUrl = process.env.DATABASE_URL_UNPOOLED;
 if (!directDatabaseUrl) {
-  throw new Error("Set DIRECT_URL before running the sample seed.");
+  throw new Error(
+    "Set DATABASE_URL_UNPOOLED to a direct PostgreSQL URL before running the sample seed.",
+  );
 }
 const prisma = new PrismaClient({
   datasourceUrl: directDatabaseUrl,

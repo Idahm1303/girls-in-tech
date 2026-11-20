@@ -15,7 +15,16 @@ export default function RegisterPage() {
 
 async function RegisterContent() {
   await connection();
-  const member = await getCurrentMember();
+  let member: Awaited<ReturnType<typeof getCurrentMember>> = null;
+  try {
+    member = await getCurrentMember();
+  } catch (error) {
+    console.error(
+      "Could not check the current member on registration; showing the registration form.",
+      error,
+    );
+  }
+
   if (member) {
     redirect(
       postLoginPath(

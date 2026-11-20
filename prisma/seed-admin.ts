@@ -23,9 +23,11 @@ async function main() {
     );
   }
 
-  const directUrl = process.env.DIRECT_URL ?? process.env.DATABASE_URL_UNPOOLED;
-  if (!directUrl) {
-    throw new Error("Set DIRECT_URL to the direct PostgreSQL connection string.");
+  const directUrl = process.env.DATABASE_URL_UNPOOLED;
+  if (!directUrl || !/^postgres(?:ql)?:\/\//i.test(directUrl)) {
+    throw new Error(
+      "Set DATABASE_URL_UNPOOLED to a direct PostgreSQL connection string.",
+    );
   }
 
   const prisma = new PrismaClient({ datasourceUrl: directUrl });
@@ -39,32 +41,25 @@ async function main() {
         "That email belongs to a non-admin account. Choose a separate admin email.",
       );
     }
+    if (existing) {
+      console.log(
+        `Administrator account already exists for ${parsed.data.email}; no changes were made.`,
+      );
+      return;
+    }
 
     const passwordHash = await hash(parsed.data.password, 12);
-    if (existing) {
-      await prisma.user.update({
-        where: { id: existing.id },
-        data: {
-          name: parsed.data.name,
-          passwordHash,
-          status: AccountStatus.APPROVED,
-          emailVerifiedAt: new Date(),
-          consentAt: new Date(),
-        },
-      });
-    } else {
-      await prisma.user.create({
-        data: {
-          name: parsed.data.name,
-          email: parsed.data.email,
-          passwordHash,
-          role: UserRole.ADMIN,
-          status: AccountStatus.APPROVED,
-          emailVerifiedAt: new Date(),
-          consentAt: new Date(),
-        },
-      });
-    }
+    await prisma.user.create({
+      data: {
+        name: parsed.data.name,
+        email: parsed.data.email,
+        passwordHash,
+        role: UserRole.ADMIN,
+        status: AccountStatus.APPROVED,
+        emailVerifiedAt: new Date(),
+        consentAt: new Date(),
+      },
+    });
     console.log(`Administrator account is ready for ${parsed.data.email}.`);
   } finally {
     await prisma.$disconnect();

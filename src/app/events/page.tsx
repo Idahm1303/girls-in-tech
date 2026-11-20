@@ -1,8 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
+import { redirect } from "next/navigation";
 import { TUT_EVENT_ARCHIVE } from "@/lib/event-archive";
-import { requireStudent } from "@/lib/member-access";
+import { getCurrentMember, roleHome } from "@/lib/member-access";
 import { prisma } from "@/lib/prisma";
 
 type EventsSearchParams = Promise<{ view?: string | string[] }>;
@@ -35,27 +36,61 @@ async function EventsLibrary({
   searchParams: EventsSearchParams;
 }) {
   await connection();
-  await requireStudent();
+  let member: Awaited<ReturnType<typeof getCurrentMember>> = null;
+  let authUnavailable = false;
+  try {
+    member = await getCurrentMember();
+  } catch (error) {
+    authUnavailable = true;
+    console.error(
+      "Could not verify access to events; rendering the public events view.",
+      error,
+    );
+  }
+
+  if (!authUnavailable) {
+    if (!member) redirect("/login");
+    if (member.role !== "STUDENT") redirect(roleHome[member.role]);
+    if (!member.studentProfile?.profileCompletedAt) redirect("/complete-profile");
+  }
 
   const { view } = await searchParams;
   const showPast = view === "past";
   const now = new Date();
-  const events = await prisma.event.findMany({
-    where: {
-      status: "PUBLISHED",
-      ...(showPast ? { endsAt: { lt: now } } : { endsAt: { gte: now } }),
-    },
-    orderBy: { startsAt: showPast ? "desc" : "asc" },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      startsAt: true,
-      endsAt: true,
-      venue: true,
-      onlineUrl: true,
-    },
-  });
+  let events: Array<{
+    id: string;
+    title: string;
+    description: string;
+    startsAt: Date;
+    endsAt: Date;
+    venue: string | null;
+    onlineUrl: string | null;
+  }> = [];
+  let eventsUnavailable = false;
+  try {
+    events = await prisma.event.findMany({
+      where: {
+        status: "PUBLISHED",
+        ...(showPast ? { endsAt: { lt: now } } : { endsAt: { gte: now } }),
+      },
+      orderBy: { startsAt: showPast ? "desc" : "asc" },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        startsAt: true,
+        endsAt: true,
+        venue: true,
+        onlineUrl: true,
+      },
+    });
+  } catch (error) {
+    eventsUnavailable = true;
+    console.error(
+      "Could not load events; rendering the events page with an empty list.",
+      error,
+    );
+  }
 
   return (
     <main className="events-page">
@@ -84,7 +119,18 @@ async function EventsLibrary({
         </nav>
 
         {showPast ? (
-          <PastEvents events={events} />
+          <>
+            {eventsUnavailable && (
+              <p className="events-empty" role="status">
+                Events are temporarily unavailable. Please check back soon.
+              </p>
+            )}
+            <PastEvents events={events} />
+          </>
+        ) : eventsUnavailable ? (
+          <p className="events-empty" role="status">
+            Events are temporarily unavailable. Please check back soon.
+          </p>
         ) : (
           <section aria-label="Upcoming events" className="event-list">
             {events.length ? (

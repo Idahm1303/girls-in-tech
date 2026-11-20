@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { connection } from "next/server";
+import type { Session } from "next-auth";
 import { auth, signOut } from "@/../auth";
 
 async function logout() {
@@ -9,7 +10,16 @@ async function logout() {
 
 export async function AccountLinks() {
   await connection();
-  const session = await auth();
+  let session: Session | null = null;
+  try {
+    session = await auth();
+  } catch (error) {
+    console.error(
+      "Could not read the session for site navigation; rendering signed-out links.",
+      error,
+    );
+  }
+
   if (!session?.user) {
     return (
       <Link href="/login">Log in</Link>
