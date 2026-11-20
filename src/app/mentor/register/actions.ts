@@ -15,6 +15,11 @@ import {
   type MentorRegistrationFields,
 } from "@/lib/mentor-validation";
 import { sendMentorEmails } from "@/lib/mentor-email";
+import {
+  buildMentorAvailabilityOccurrences,
+  formatMentorAvailability,
+  MENTOR_TIMEZONE,
+} from "@/lib/mentor-schedule";
 import type { FormActionState } from "@/lib/account-validation";
 
 const mentorApplicationTransactionOptions = { maxWait: 10_000, timeout: 15_000 };
@@ -47,11 +52,27 @@ function readForm(formData: FormData) {
     bio: formData.get("bio"),
     linkedinUrl: formData.get("linkedinUrl"),
     expertise: formData.getAll("expertise"),
-    sessionFormat: formData.get("sessionFormat"),
+    expertiseOther: formData.get("expertiseOther") ?? "",
+    sessionFormat: formData.get("sessionFormat") ?? "NO_PREFERENCE",
     meetingTool: formData.get("meetingTool"),
     campuses: formData.getAll("campuses"),
-    maxMentees: formData.get("maxMentees"),
+    maxMentees: formData.get("maxMentees") ?? "1",
+    sessionLengthMinutes: formData.get("sessionLengthMinutes"),
+    minimumNoticeHours: formData.get("minimumNoticeHours"),
     availability: formData.getAll("availability"),
+    motivationReasons: formData.getAll("motivationReasons"),
+    motivationReasonsOther: formData.get("motivationReasonsOther") ?? "",
+    helpWith: formData.getAll("helpWith"),
+    helpWithOther: formData.get("helpWithOther") ?? "",
+    currentStatus: formData.get("currentStatus"),
+    currentStatusOther: formData.get("currentStatusOther") ?? "",
+    meetingFrequency: formData.get("meetingFrequency") ?? "",
+    menteeGroups: formData.getAll("menteeGroups"),
+    languages: formData.getAll("languages"),
+    languagesOther: formData.get("languagesOther") ?? "",
+    campusConnection: formData.get("campusConnection") ?? "",
+    referralSource: formData.get("referralSource") ?? "",
+    referralSourceOther: formData.get("referralSourceOther") ?? "",
     motivation: formData.get("motivation"),
     consentPublicProfile: formData.get("consentPublicProfile") === "on",
     consentCodeOfConduct: formData.get("consentCodeOfConduct") === "on",
@@ -65,7 +86,8 @@ async function createMentorApplication(
   input: MentorApplicationFields,
   adminIds: string[],
 ) {
-  await transaction.mentorProfile.create({
+  const optionalAnswer = (value: string) => value.trim() || null;
+  const profile = await transaction.mentorProfile.create({
     data: {
       userId,
       phone: input.phone,
@@ -79,11 +101,32 @@ async function createMentorApplication(
       isTutAlumna: input.isTutAlumna === "yes",
       bio: input.bio,
       linkedinUrl: input.linkedinUrl || null,
-      sessionFormat: input.sessionFormat,
+      sessionFormat: input.sessionFormat ?? "NO_PREFERENCE",
+      sessionLengthMinutes: input.sessionLengthMinutes,
+      minimumNoticeHours: input.minimumNoticeHours,
+      timezone: MENTOR_TIMEZONE,
+      weeklyAvailability: input.availability,
       meetingTool: input.meetingTool,
       campuses: input.campuses,
       maxMentees: input.maxMentees,
-      availabilityNotes: input.availability.join(", "),
+      motivationReasons: input.motivationReasons,
+      motivationReasonsOther: optionalAnswer(input.motivationReasonsOther),
+      helpWith: input.helpWith,
+      helpWithOther: optionalAnswer(input.helpWithOther),
+      currentStatus: input.currentStatus,
+      currentStatusOther: optionalAnswer(input.currentStatusOther),
+      expertiseOther: optionalAnswer(input.expertiseOther),
+      meetingFrequency: optionalAnswer(input.meetingFrequency),
+      menteeGroups: input.menteeGroups,
+      languages: input.languages,
+      languagesOther: optionalAnswer(input.languagesOther),
+      campusConnection: optionalAnswer(input.campusConnection),
+      referralSource: optionalAnswer(input.referralSource),
+      referralSourceOther: optionalAnswer(input.referralSourceOther),
+      availabilityNotes: formatMentorAvailability(
+        input.availability,
+        input.sessionLengthMinutes,
+      ),
       motivation: input.motivation,
       consentGivenAt: new Date(),
       status: "PENDING",
@@ -101,6 +144,19 @@ async function createMentorApplication(
     },
     select: { id: true },
   });
+  const availabilitySlots = buildMentorAvailabilityOccurrences(
+    input.availability,
+    input.sessionLengthMinutes,
+    new Date(),
+  );
+  if (availabilitySlots.length) {
+    await transaction.availabilitySlot.createMany({
+      data: availabilitySlots.map((slot) => ({
+        ...slot,
+        mentorProfileId: profile.id,
+      })),
+    });
+  }
 
   await transaction.notification.create({
     data: {

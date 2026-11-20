@@ -72,7 +72,8 @@ PostgreSQL `StoredFile` table. Do not upload CVs or PDFs.
 
 ## Brand assets
 
-- The institutional logo is omitted until the approved corporate logo is provided.
+- TUT wordmark: `public/brand/tut-wordmark.png`.
+- High-resolution TUT logo: `public/brand/tut-logo.pdf`.
 - GiT infinity mark: `public/brand/git-infinity.svg`.
 - GiT motto: “Limitless minds. Infinite Code.”
 - Pink and plum brand colors: `#C0266D` and `#642044`.

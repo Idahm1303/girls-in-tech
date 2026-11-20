@@ -226,11 +226,6 @@ summary {
   display: inline-flex;
   align-items: center;
   margin-bottom: 1.6rem;
-  border: 1px solid rgb(255 255 255 / 84%);
-  border-radius: 0.6rem;
-  background: #fff;
-  padding: 0.45rem 0.7rem;
-  box-shadow: 0 8px 24px rgb(7 31 52 / 18%);
 }
 
 .hero-tut-logo {
@@ -243,7 +238,7 @@ summary {
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 1.1rem;
-  font-size: 1.05rem;
+  font-size: clamp(1.3rem, 2vw, 1.5rem);
   font-weight: 650;
   letter-spacing: -0.02em;
 }
@@ -729,14 +724,12 @@ summary {
   display: inline-flex;
   max-width: 190px;
   align-items: center;
-  border-radius: 0.55rem;
-  background: #fff;
-  padding: 0.4rem 0.55rem;
 }
 
 .footer-tut-logo {
   width: 170px;
   height: auto;
+  filter: brightness(0) invert(1);
 }
 
 .footer-institution p {
@@ -1189,6 +1182,138 @@ summary {
   gap: 0.25rem;
 }
 
+.mentor-availability-picker {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 0.75rem;
+}
+
+.mentor-session-summary {
+  display: grid;
+  gap: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: var(--background);
+  padding: 0.8rem;
+}
+
+.mentor-session-summary p {
+  margin: 0;
+  color: var(--foreground);
+  font-size: 0.88rem;
+}
+
+.mentor-session-settings {
+  margin-top: 0.25rem;
+}
+
+.mentor-session-settings > summary {
+  color: var(--navy);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.mentor-session-settings .mentor-form-grid {
+  margin-top: 0.8rem;
+}
+
+.mentor-schedule-days {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(3.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.mentor-day-toggle,
+.mentor-time-slot {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: #fff;
+  padding: 0.55rem 0.65rem;
+  color: var(--foreground);
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+
+.mentor-day-toggle input,
+.mentor-time-slot input {
+  accent-color: var(--periwinkle);
+}
+
+.mentor-day-slots {
+  display: grid;
+  gap: 0.7rem;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 0.8rem;
+}
+
+.mentor-day-slots > legend {
+  padding: 0 0.3rem;
+  color: var(--navy);
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.mentor-day-slot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.mentor-time-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.4rem;
+}
+
+.mentor-time-slot {
+  min-width: 0;
+  justify-content: flex-start;
+  white-space: nowrap;
+}
+
+.mentor-booking-slots {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.85rem;
+}
+
+.mentor-booking-slots h3 {
+  margin: 0;
+  color: var(--navy);
+  font-size: 1rem;
+}
+
+.mentor-booking-slots ul {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mentor-booking-slots li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  padding: 0.6rem;
+  color: var(--foreground);
+  font-size: 0.82rem;
+}
+
 .mentor-consents {
   display: grid;
   gap: 0.75rem;
@@ -1377,6 +1502,24 @@ summary {
   overflow-wrap: anywhere;
 }
 
+.mentor-about-section {
+  display: grid;
+  gap: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.mentor-directory-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: end;
+  gap: 0.8rem;
+  margin-top: 1.25rem;
+}
+
+.mentor-directory-filters .form-field {
+  margin: 0;
+}
+
 .mentor-directory-title {
   margin: 0;
   font-weight: 700;
@@ -1473,6 +1616,10 @@ summary {
     grid-template-columns: 1fr;
   }
 
+  .mentor-time-slot-grid {
+    grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  }
+
   .mentor-slot-form > * {
     grid-column: auto !important;
   }
@@ -1552,7 +1699,8 @@ summary {
 }
 
 .form-field input,
-.form-field select {
+.form-field select,
+.admin-content-page .form-field textarea {
   width: 100%;
   min-height: 48px;
   border: 1px solid #e4c4d2;
@@ -1560,12 +1708,19 @@ summary {
   background: #fff;
   padding: 0.72rem 0.8rem;
   color: var(--foreground);
+  -webkit-text-fill-color: var(--foreground);
+  text-transform: none;
   font: inherit;
   font-size: 1rem;
 }
 
+.admin-content-page .form-field textarea {
+  resize: vertical;
+}
+
 .form-field input:focus-visible,
 .form-field select:focus-visible,
+.admin-content-page .form-field textarea:focus-visible,
 .consent-field input:focus-visible {
   outline: 3px solid var(--periwinkle);
   outline-offset: 2px;
@@ -1829,6 +1984,86 @@ summary {
 .events-inner {
   width: min(100%, 960px);
   margin: 0 auto;
+}
+
+.about-content-section {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1.4rem;
+}
+
+.about-content-section h2,
+.about-content-section p {
+  margin: 0;
+}
+
+.about-content-section p {
+  line-height: 1.6;
+}
+
+.about-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+}
+
+.about-link-card {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  color: var(--navy);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.about-link-card:hover,
+.about-link-card:focus-visible {
+  border-color: var(--periwinkle);
+  outline: none;
+}
+
+.about-vision-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1rem;
+}
+
+.about-vision-grid > div {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.about-team-placeholder {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  background: var(--periwinkle-soft);
+  color: var(--navy);
+  font-weight: 750;
+}
+
+.about-hashtags {
+  margin: 2rem 0 0;
+  color: var(--navy);
+  font-weight: 700;
+  text-align: center;
+}
+
+.about-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 
 .events-inner h1 {
@@ -2350,4 +2585,91 @@ summary {
   .team-co-leads-grid {
     grid-template-columns: 1fr;
   }
+}
+
+#main-content main :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    a,
+    button,
+    label,
+    li,
+    span,
+    small,
+    summary,
+    dt,
+    dd,
+    blockquote,
+    legend,
+    th,
+    td,
+    figcaption,
+    caption,
+    output,
+    strong,
+    em
+  ) {
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+#main-content > main:not(:has(.hero)),
+#main-content > main:not(:has(.hero)) :where(*) {
+  font-size: 14px !important;
+}
+
+#main-content > main:not(:has(.hero)) h1 {
+  font-size: 24px !important;
+}
+
+#main-content > main:not(:has(.hero)) .mentor-step > legend {
+  font-size: 16px !important;
+}
+
+#main-content > main:not(:has(.hero)) :is(h2, h3, h4, h5, h6) {
+  font-size: 16px !important;
+}
+
+#main-content > main:not(:has(.hero)) :is(
+    .field-hint,
+    .field-error,
+    .eyebrow,
+    .consent-field,
+    .consent-field span,
+    .consent-field a,
+    .mentor-detail-grid dt,
+    .events-archive-note,
+    .event-date,
+    .event-meta,
+    .events-empty,
+    figcaption,
+    caption
+  ) {
+  font-size: 12px !important;
+}
+
+#main-content > main:not(:has(.hero)) :is(.event-card h2, .mentor-directory-card h2) {
+  font-size: 16px !important;
+}
+
+#main-content > main.about-page :is(
+    h1,
+    h2,
+    h3,
+    .about-content-section > p,
+    .about-vision-grid p,
+    .about-hashtags,
+    .about-link-card span,
+    .about-cta a
+  ) {
+  text-transform: none;
+}
+
+#main-content > main.about-page :is(.about-content-section > p, .about-vision-grid p) {
+  font-weight: 400;
 }

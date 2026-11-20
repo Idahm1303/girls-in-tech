@@ -40,6 +40,9 @@ enum MentorSessionFormat {
   ONLINE
   IN_PERSON
   BOTH
+  PHONE_CALL
+  CHAT_MESSAGING
+  NO_PREFERENCE
 }
 
 enum MentorMeetingTool {
@@ -172,25 +175,43 @@ model MentorProfile {
   bio               String
   linkedinUrl       String?
   photoFileId       String?                 @unique
-  sessionFormat     MentorSessionFormat     @default(BOTH)
-  meetingTool       MentorMeetingTool       @default(TEAMS)
-  campuses          Campus[]                @default([])
-  maxMentees        Int                     @default(1)
-  availabilityNotes String                  @default("")
-  motivation        String                  @default("")
-  consentGivenAt    DateTime?
-  status            MentorApplicationStatus @default(PENDING)
-  createdAt         DateTime                @default(now())
-  reviewedById      String?
-  reviewedAt        DateTime?
-  reviewNote        String?
-  profileImageUrl   String?
-  isPublished       Boolean                 @default(false)
-  user              User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  reviewedBy        User?                   @relation("MentorReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
-  photoFile         StoredFile?             @relation("MentorPhoto", fields: [photoFileId], references: [id], onDelete: SetNull)
-  interests         MentorInterest[]
-  availability      AvailabilitySlot[]
+  sessionFormat        MentorSessionFormat     @default(BOTH)
+  motivationReasons    String[]                @default([])
+  motivationReasonsOther String?
+  helpWith             String[]                @default([])
+  helpWithOther        String?
+  currentStatus        String?
+  currentStatusOther   String?
+  expertiseOther       String?
+  meetingFrequency     String?
+  menteeGroups         String[]                @default([])
+  languages            String[]                @default([])
+  languagesOther       String?
+  campusConnection     String?
+  referralSource       String?
+  referralSourceOther  String?
+  sessionLengthMinutes Int                     @default(30)
+  minimumNoticeHours   Int                     @default(24)
+  timezone             String                  @default("Africa/Johannesburg")
+  weeklyAvailability   String[]                @default([])
+  meetingTool          MentorMeetingTool       @default(TEAMS)
+  campuses             Campus[]                @default([])
+  maxMentees           Int                     @default(1)
+  availabilityNotes    String                  @default("")
+  motivation           String                  @default("")
+  consentGivenAt       DateTime?
+  status               MentorApplicationStatus @default(PENDING)
+  createdAt            DateTime                @default(now())
+  reviewedById         String?
+  reviewedAt           DateTime?
+  reviewNote           String?
+  profileImageUrl      String?
+  isPublished          Boolean                 @default(false)
+  user                 User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewedBy           User?                   @relation("MentorReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  photoFile            StoredFile?             @relation("MentorPhoto", fields: [photoFileId], references: [id], onDelete: SetNull)
+  interests            MentorInterest[]
+  availability         AvailabilitySlot[]
 
   @@index([industry, isPublished])
   @@index([status, createdAt])
@@ -345,6 +366,16 @@ model TeamMember {
   user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([displayOrder])
+}
+
+model AboutPageContent {
+  id           String   @id
+  introduction String
+  whatWeDo     String
+  commitment   String
+  vision       String
+  mission      String
+  updatedAt    DateTime @updatedAt
 }
 
 model Post {

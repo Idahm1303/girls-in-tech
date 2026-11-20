@@ -8,7 +8,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test src/lib/account-validation.test.ts src/lib/mentor-registration.test.ts",
+    "test": "tsx --test src/lib/account-validation.test.ts src/lib/mentor-registration.test.ts src/lib/about-content.test.ts",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",

@@ -14,6 +14,21 @@ const campusNames: Record<string, string> = {
   GIYANE: "Giyane",
   ONLINE_ONLY: "Online only",
 };
+const sessionFormatNames: Record<string, string> = {
+  ONLINE: "Online video call",
+  PHONE_CALL: "Phone call",
+  CHAT_MESSAGING: "Chat/messaging",
+  IN_PERSON: "In person (campus)",
+  NO_PREFERENCE: "No preference",
+  BOTH: "No preference",
+};
+const experienceBandNames: Record<number, string> = {
+  0: "Less than 1 year",
+  2: "1-3 years",
+  5: "4-6 years",
+  8: "7-10 years",
+  10: "10+ years",
+};
 
 export default function MentorApplicationDetailPage({
   params,
@@ -74,17 +89,25 @@ async function MentorApplicationDetail({
           <div><dt>Job title</dt><dd>{profile.jobTitle || profile.title}</dd></div>
           <div><dt>Company</dt><dd>{profile.company || profile.organization}</dd></div>
           <div><dt>Industry</dt><dd>{profile.industry}</dd></div>
-          <div><dt>Experience</dt><dd>{profile.yearsExperience} years</dd></div>
+          <div><dt>Years of experience</dt><dd>{experienceBandNames[profile.yearsExperience] ?? `${profile.yearsExperience} years`}</dd></div>
           <div><dt>Highest qualification</dt><dd>{profile.qualification}</dd></div>
           <div><dt>TUT alumna</dt><dd>{profile.isTutAlumna ? "Yes" : "No"}</dd></div>
-          <div><dt>Session format</dt><dd>{profile.sessionFormat.replace("_", " ")}</dd></div>
+          <div><dt>Preferred session format</dt><dd>{sessionFormatNames[profile.sessionFormat] ?? profile.sessionFormat.replace("_", " ")}</dd></div>
+          <div><dt>Current status</dt><dd>{[profile.currentStatus, profile.currentStatusOther].filter(Boolean).join(" · ") || "Not provided"}</dd></div>
           <div><dt>Meeting tool</dt><dd>{profile.meetingTool.replace("_", " ")}</dd></div>
           <div><dt>Campuses</dt><dd>{profile.campuses.map((campus) => campusNames[campus] ?? campus).join(", ")}</dd></div>
-          <div><dt>Maximum mentees</dt><dd>{profile.maxMentees}</dd></div>
+          <div><dt>Maximum mentees at a time</dt><dd>{profile.maxMentees === 5 ? "4-5" : profile.maxMentees}</dd></div>
+          <div><dt>Meeting frequency</dt><dd>{profile.meetingFrequency ?? "Not provided"}</dd></div>
+          <div><dt>Preferred campus connection</dt><dd>{profile.campusConnection ?? "Not provided"}</dd></div>
+          <div><dt>Mentoring languages</dt><dd>{[...profile.languages, profile.languagesOther].filter(Boolean).join(", ") || "Not provided"}</dd></div>
+          <div><dt>Would like to mentor</dt><dd>{profile.menteeGroups.join(", ") || "Not provided"}</dd></div>
           <div><dt>Availability</dt><dd>{profile.availabilityNotes || "Not provided"}</dd></div>
           <div><dt>LinkedIn</dt><dd>{profile.linkedinUrl ?? "Not provided"}</dd></div>
-          <div><dt>Expertise areas</dt><dd>{profile.interests.map(({ interest }) => interest.name).join(", ")}</dd></div>
+          <div><dt>Expertise areas</dt><dd>{[...profile.interests.map(({ interest }) => interest.name), profile.expertiseOther].filter(Boolean).join(", ") || "Not provided"}</dd></div>
           <div className="mentor-detail-wide"><dt>Bio</dt><dd>{profile.bio}</dd></div>
+          <div className="mentor-detail-wide"><dt>What they hope to get from mentoring (admin only)</dt><dd>{[...profile.motivationReasons, profile.motivationReasonsOther].filter(Boolean).join(", ") || "Not provided"}</dd></div>
+          <div className="mentor-detail-wide"><dt>Can help with</dt><dd>{[...profile.helpWith, profile.helpWithOther].filter(Boolean).join(", ") || "Not provided"}</dd></div>
+          <div><dt>How they heard about GiT (admin only)</dt><dd>{[profile.referralSource, profile.referralSourceOther].filter(Boolean).join(" · ") || "Not provided"}</dd></div>
           <div className="mentor-detail-wide"><dt>Motivation (admin only)</dt><dd>{profile.motivation}</dd></div>
           <div className="mentor-detail-wide"><dt>Previous review note</dt><dd>{profile.reviewNote ?? "None"}</dd></div>
           <div><dt>Submitted</dt><dd>{profile.createdAt.toLocaleDateString()}</dd></div>

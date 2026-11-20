@@ -101,6 +101,20 @@ async function AdminContent({
       },
     },
   });
+  const sessions = await prisma.mentorshipSession.findMany({
+    where: {
+      status: "ACCEPTED",
+      availabilitySlot: { is: { startsAt: { gte: new Date() } } },
+    },
+    orderBy: { availabilitySlot: { startsAt: "asc" } },
+    take: 50,
+    select: {
+      id: true,
+      mentor: { select: { name: true, surname: true } },
+      student: { select: { name: true, surname: true } },
+      availabilitySlot: { select: { startsAt: true, endsAt: true } },
+    },
+  });
 
   return (
     <main className="dashboard-page">
@@ -112,6 +126,44 @@ async function AdminContent({
             Review mentor applications
           </Link>
         </p>
+        <p className="admin-mentor-link">
+          <Link className="button button-outline-dark" href="/admin/content">
+            Manage About page and team
+          </Link>
+        </p>
+        <section aria-labelledby="admin-sessions-title" className="admin-students">
+          <h2 id="admin-sessions-title">Upcoming mentor sessions</h2>
+          {sessions.length ? (
+            <ul className="mentor-slot-list">
+              {sessions.map((session) => (
+                <li key={session.id}>
+                  {session.availabilitySlot && (
+                    <>
+                      {session.availabilitySlot.startsAt.toLocaleString("en-ZA", {
+                        timeZone: "Africa/Johannesburg",
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hourCycle: "h23",
+                      })}
+                      {"–"}
+                      {session.availabilitySlot.endsAt.toLocaleTimeString("en-ZA", {
+                        timeZone: "Africa/Johannesburg",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hourCycle: "h23",
+                      })}
+                    </>
+                  )}
+                  {" · "}{session.mentor.name} {session.mentor.surname}
+                  {" with "}{session.student.name} {session.student.surname}
+                </li>
+              ))}
+            </ul>
+          ) : <p className="field-hint">No upcoming sessions are booked.</p>}
+        </section>
         <section aria-labelledby="student-list-title" className="admin-students">
           <div className="admin-students-heading">
             <div>

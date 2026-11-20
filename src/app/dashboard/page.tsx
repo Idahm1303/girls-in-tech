@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { connection } from "next/server";
 import { requireStudent } from "@/lib/member-access";
+import { prisma } from "@/lib/prisma";
+import { formatMentorSessionDate } from "@/lib/mentor-schedule";
 
 const actions = [
   {
@@ -38,6 +40,20 @@ export default function DashboardPage() {
 async function DashboardContent() {
   await connection();
   const member = await requireStudent();
+  const sessions = await prisma.mentorshipSession.findMany({
+    where: {
+      studentId: member.id,
+      status: "ACCEPTED",
+      availabilitySlot: { is: { startsAt: { gte: new Date() } } },
+    },
+    orderBy: { availabilitySlot: { startsAt: "asc" } },
+    take: 20,
+    select: {
+      id: true,
+      mentor: { select: { name: true, surname: true } },
+      availabilitySlot: { select: { startsAt: true, endsAt: true } },
+    },
+  });
 
   return (
     <main className="dashboard-page">
@@ -61,6 +77,29 @@ async function DashboardContent() {
               {member.studentProfile?.qualification ?? "Not provided"}
             </strong>
           </div>
+        </section>
+        <section aria-labelledby="student-sessions-title" className="admin-students">
+          <h2 id="student-sessions-title">Your upcoming mentor sessions</h2>
+          {sessions.length ? (
+            <ul className="mentor-slot-list">
+              {sessions.map((session) => (
+                <li key={session.id}>
+                  {session.availabilitySlot && (
+                    <>
+                      {formatMentorSessionDate(session.availabilitySlot.startsAt)}–
+                      {new Intl.DateTimeFormat("en-ZA", {
+                        timeZone: "Africa/Johannesburg",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hourCycle: "h23",
+                      }).format(session.availabilitySlot.endsAt)}
+                    </>
+                  )}
+                  {" · "}{session.mentor.name} {session.mentor.surname}
+                </li>
+              ))}
+            </ul>
+          ) : <p className="field-hint">You have no upcoming mentor sessions.</p>}
         </section>
         <h2 className="dashboard-journey-title">Your next steps</h2>
         <div className="dashboard-grid">

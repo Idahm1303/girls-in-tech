@@ -5,14 +5,22 @@ import { z } from "zod";
 import { getCurrentMember } from "@/lib/member-access";
 import { prisma } from "@/lib/prisma";
 import {
-  MENTOR_EXPERTISE,
+  MENTOR_PROFILE_EXPERTISE,
 } from "@/lib/mentor-validation";
 import { StorageValidationError, deleteStoredFile, storeMentorPhoto } from "@/lib/storage";
+import {
+  buildMentorAvailabilityOccurrences,
+  formatMentorAvailability,
+  MENTOR_TIMEZONE,
+  parseMentorLocalDateTime,
+} from "@/lib/mentor-schedule";
+import { mentorScheduleSchema } from "@/lib/mentor-validation";
 
 const profileSchema = z.object({
   bio: z.string().trim().min(20).max(600),
   availabilityNotes: z.string().trim().max(1000),
-  expertise: z.array(z.enum(MENTOR_EXPERTISE)).min(1),
+  expertise: z.array(z.enum(MENTOR_PROFILE_EXPERTISE)).min(1),
+  expertiseOther: z.string().trim().max(120),
 });
 
 export async function updateMentorProfile(formData: FormData) {
@@ -23,6 +31,7 @@ export async function updateMentorProfile(formData: FormData) {
     bio: formData.get("bio"),
     availabilityNotes: formData.get("availabilityNotes"),
     expertise: formData.getAll("expertise"),
+    expertiseOther: formData.get("expertiseOther") ?? "",
   });
   if (!parsed.success) redirect("/mentor?error=invalid-profile");
 
@@ -67,6 +76,7 @@ export async function updateMentorProfile(formData: FormData) {
           bio: parsed.data.bio,
           availabilityNotes: parsed.data.availabilityNotes,
           photoFileId,
+          expertiseOther: parsed.data.expertiseOther.trim() || null,
         },
       });
       if (photo && current.photoFileId) {
@@ -101,29 +111,108 @@ export async function addMentorAvailability(formData: FormData) {
   });
   if (!parsed.success) redirect("/mentor?error=invalid-slot");
 
-  const start = new Date(`${parsed.data.date}T${parsed.data.startsAt}:00`);
-  const end = new Date(`${parsed.data.date}T${parsed.data.endsAt}:00`);
+  const profile = await prisma.mentorProfile.findUnique({
+    where: { userId: member.id },
+    select: {
+      id: true,
+      sessionLengthMinutes: true,
+      minimumNoticeHours: true,
+    },
+  });
+  if (!profile) redirect("/mentor/status");
+  const start = parseMentorLocalDateTime(parsed.data.date, parsed.data.startsAt);
+  const end = parseMentorLocalDateTime(parsed.data.date, parsed.data.endsAt);
+  const earliestStart = new Date(
+    Date.now() + profile.minimumNoticeHours * 60 * 60 * 1000,
+  );
   if (
-    Number.isNaN(start.getTime()) ||
-    Number.isNaN(end.getTime()) ||
-    start <= new Date() ||
-    end <= start
+    !start ||
+    !end ||
+    start < earliestStart ||
+    end.getTime() - start.getTime() !== profile.sessionLengthMinutes * 60 * 1000
   ) {
     redirect("/mentor?error=invalid-slot");
   }
-
-  const profile = await prisma.mentorProfile.findUnique({
-    where: { userId: member.id },
-    select: { id: true },
-  });
-  if (!profile) redirect("/mentor/status");
   const slots = Array.from({ length: parsed.data.repeatWeekly ? 12 : 1 }, (_, index) => {
-    const startsAt = new Date(start);
-    const endsAt = new Date(end);
-    startsAt.setDate(startsAt.getDate() + index * 7);
-    endsAt.setDate(endsAt.getDate() + index * 7);
+    const startsAt = new Date(start.getTime() + index * 7 * 24 * 60 * 60 * 1000);
+    const endsAt = new Date(end.getTime() + index * 7 * 24 * 60 * 60 * 1000);
     return { mentorProfileId: profile.id, startsAt, endsAt };
   });
   await prisma.availabilitySlot.createMany({ data: slots });
+  redirect("/mentor?updated=availability");
+}
+
+export async function updateMentorAvailability(formData: FormData) {
+  const member = await getCurrentMember();
+  if (!member || member.role !== "MENTOR") redirect("/login");
+  if (member.mentorProfile?.status !== "APPROVED") redirect("/mentor/status");
+  const parsed = mentorScheduleSchema.safeParse({
+    availability: formData.getAll("availability"),
+    sessionLengthMinutes: formData.get("sessionLengthMinutes"),
+    minimumNoticeHours: formData.get("minimumNoticeHours"),
+  });
+  if (!parsed.success) redirect("/mentor?error=invalid-availability");
+
+  const now = new Date();
+  await prisma.$transaction(async (transaction) => {
+    const profile = await transaction.mentorProfile.findUnique({
+      where: { userId: member.id },
+      select: { id: true },
+    });
+    if (!profile) redirect("/mentor/status");
+
+    await transaction.$queryRaw`
+      SELECT "id" FROM "MentorProfile" WHERE "id" = ${profile.id} FOR UPDATE
+    `;
+    await transaction.mentorProfile.update({
+      where: { id: profile.id },
+      data: {
+        availabilityNotes: formatMentorAvailability(
+          parsed.data.availability,
+          parsed.data.sessionLengthMinutes,
+        ),
+        weeklyAvailability: parsed.data.availability,
+        sessionLengthMinutes: parsed.data.sessionLengthMinutes,
+        minimumNoticeHours: parsed.data.minimumNoticeHours,
+        timezone: MENTOR_TIMEZONE,
+      },
+    });
+    await transaction.availabilitySlot.deleteMany({
+      where: {
+        mentorProfileId: profile.id,
+        status: "AVAILABLE",
+        startsAt: { gt: now },
+      },
+    });
+
+    const bookedSlots = await transaction.availabilitySlot.findMany({
+      where: {
+        mentorProfileId: profile.id,
+        status: "BOOKED",
+        endsAt: { gt: now },
+      },
+      select: { startsAt: true, endsAt: true },
+    });
+    const occurrences = buildMentorAvailabilityOccurrences(
+      parsed.data.availability,
+      parsed.data.sessionLengthMinutes,
+      now,
+    ).filter(
+      (occurrence) =>
+        !bookedSlots.some(
+          (booked) =>
+            booked.startsAt < occurrence.endsAt &&
+            booked.endsAt > occurrence.startsAt,
+        ),
+    );
+    if (occurrences.length) {
+      await transaction.availabilitySlot.createMany({
+        data: occurrences.map((slot) => ({
+          ...slot,
+          mentorProfileId: profile.id,
+        })),
+      });
+    }
+  });
   redirect("/mentor?updated=availability");
 }
