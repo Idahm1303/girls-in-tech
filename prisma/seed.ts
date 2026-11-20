@@ -2,6 +2,7 @@ import { PrismaClient, UserRole, AccountStatus, Campus, EventStatus, Opportunity
 import { hash } from "bcryptjs";
 import { loadEnvConfig } from "@next/env";
 import { upsertTeamRoster } from "./team-seed";
+import { upsertDefaultQrCode } from "./qr-seed";
 
 loadEnvConfig(process.cwd());
 if (process.env.NODE_ENV === "production") {
@@ -352,6 +353,7 @@ async function main() {
   }
 
   await upsertTeamRoster(prisma);
+  await upsertDefaultQrCode(prisma);
 
   await prisma.post.upsert({
     where: { slug: "welcome-to-girls-in-tech" },

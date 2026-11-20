@@ -131,6 +131,11 @@ async function AdminContent({
             Manage About page and team
           </Link>
         </p>
+        <p className="admin-mentor-link">
+          <Link className="button button-outline-dark" href="/admin/qr-codes">
+            QR Codes
+          </Link>
+        </p>
         <section aria-labelledby="admin-sessions-title" className="admin-students">
           <h2 id="admin-sessions-title">Upcoming mentor sessions</h2>
           {sessions.length ? (

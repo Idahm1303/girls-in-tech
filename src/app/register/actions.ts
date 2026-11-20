@@ -10,6 +10,10 @@ import {
   type FormActionState,
 } from "@/lib/account-validation";
 import { prisma } from "@/lib/prisma";
+import {
+  clearQrRegistrationAttribution,
+  getQrRegistrationAttribution,
+} from "@/lib/qr-attribution";
 import { registerStudent } from "@/lib/member-service";
 
 function firstFieldErrors(error: {
@@ -39,6 +43,7 @@ export async function registerAction(
   if (!parsed.success) return { errors: firstFieldErrors(parsed.error) };
 
   const passwordHash = await hash(parsed.data.password, 12);
+  const qrAttribution = await getQrRegistrationAttribution();
   const result = await registerStudent(parsed.data, passwordHash, {
     async emailExists(email) {
       return Boolean(
@@ -57,6 +62,12 @@ export async function registerAction(
           passwordHash: input.passwordHash,
           role: "STUDENT",
           consentAt: new Date(),
+          ...(qrAttribution
+            ? {
+                registrationQrCodeId: qrAttribution.qrCodeId,
+                registrationQrScannedAt: qrAttribution.scannedAt,
+              }
+            : {}),
           studentProfile: { create: {} },
         },
         select: { id: true },
@@ -70,6 +81,7 @@ export async function registerAction(
     };
   }
 
+  await clearQrRegistrationAttribution();
   const flash = welcomeFlashSchema.parse({
     name: parsed.data.name,
     surname: parsed.data.surname,

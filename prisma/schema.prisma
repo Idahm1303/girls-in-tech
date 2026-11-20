@@ -139,9 +139,13 @@ model User {
   attachments            Attachment[]        @relation("AttachmentUploader")
   authoredPosts          Post[]              @relation("PostAuthor")
   teamMembership         TeamMember?
+  registrationQrCodeId   String?
+  registrationQrScannedAt DateTime?
+  registrationQrCode     QrCode?               @relation("QrCodeRegistration", fields: [registrationQrCodeId], references: [id], onDelete: SetNull)
 
   @@index([role, status])
   @@index([campus])
+  @@index([registrationQrCodeId, registrationQrScannedAt])
 }
 
 model StudentProfile {
@@ -426,4 +430,28 @@ model Attachment {
   @@index([uploadedById, createdAt])
   @@index([opportunityId])
   @@index([postId])
+}
+
+model QrCode {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  destinationPath String    @default("/")
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  scans           QrScan[]
+  registrations   User[]    @relation("QrCodeRegistration")
+}
+
+model QrScan {
+  id          String   @id @default(cuid())
+  qrCodeId    String
+  scannedAt   DateTime @default(now())
+  deviceType  String
+  visitorHash String
+  qrCode      QrCode   @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+
+  @@index([qrCodeId, scannedAt])
+  @@index([qrCodeId, visitorHash, scannedAt])
 }

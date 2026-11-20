@@ -8,13 +8,14 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test src/lib/account-validation.test.ts src/lib/mentor-registration.test.ts src/lib/about-content.test.ts src/lib/team-avatar.test.ts",
+    "test": "tsx --test src/lib/account-validation.test.ts src/lib/mentor-registration.test.ts src/lib/about-content.test.ts src/lib/team-avatar.test.ts src/lib/qr-utils.test.ts src/lib/qr-attribution.test.ts src/lib/qr-public-url.test.ts src/lib/qr-svg.test.ts",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:admin": "tsx prisma/seed-admin.ts",
+    "db:seed:qr": "tsx prisma/seed-qr.ts",
     "db:seed:team": "tsx prisma/seed-team.ts"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "bcryptjs": "^3.0.3",
     "next": "16.4.5",
     "next-auth": "^5.0.0-beta.32",
+    "qrcode": "^1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "sharp": "^0.35.5",
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

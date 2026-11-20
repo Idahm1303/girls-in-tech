@@ -96,6 +96,15 @@ PostgreSQL `StoredFile` table. Do not upload CVs or PDFs.
 - `npm run db:seed:team` upserts the public team roster and photo paths without
   deleting existing records; use `DATABASE_URL_UNPOOLED` for the target
   database.
+- `npm run db:seed:qr` safely creates the default `Main QR` record (`/join/main`)
+  without overwriting an existing QR code or deleting records.
+
+QR links require `NEXT_PUBLIC_SITE_URL` to be a public HTTPS origin. Public scan
+links are available at `/join` (the `main` QR) and `/join/<slug>`. QR scans store
+only a daily IP/user-agent hash, device type, QR code, and scan time; repeat
+scans from the same hashed visitor and QR are deduplicated for 30 minutes.
+Admins can manage codes, download PNG/SVG artwork, and review analytics at
+`/admin/qr-codes`.
 
 Team photo uploads use public Vercel Blob storage. Connect a public Blob store
 to the Vercel project; the SDK uses Vercel's `BLOB_STORE_ID` and
@@ -121,8 +130,9 @@ server-side and never expose it to browser code.
    - `NEXT_PUBLIC_SITE_URL`: the public site origin, for example
      `https://girls-in-tech.example` (no `/api/auth` path).
    For Preview deployments, use a separate Neon branch and a separate
-   `AUTH_SECRET`; omit `AUTH_URL` and `NEXT_PUBLIC_SITE_URL` so Vercel's
-   deployment host is used (`trustHost` is enabled in Auth.js).
+   `AUTH_SECRET`. Set `NEXT_PUBLIC_SITE_URL` to the public HTTPS origin used for
+   QR links in that environment; QR image generation is unavailable if it is
+   missing or points to a local address.
 3. Optional email delivery variables are `RESEND_API_KEY`,
    `RESEND_FROM_EMAIL`, and `GIT_ADMIN_EMAIL`. The first two enable mentor
    emails; `GIT_ADMIN_EMAIL` receives new-application notifications and is
@@ -146,7 +156,9 @@ server-side and never expose it to browser code.
    To safely sync the team member photo paths, set
    `DATABASE_URL_UNPOOLED` to the production direct URL and run
    `npm run db:seed:team`. It upserts the five team records and does not reset
-   or delete other rows.
+   or delete other rows. To create the default QR link, run
+   `npm run db:seed:qr`; it only inserts `Main QR` if the `main` slug does not
+   already exist.
 5. In Vercel, open **Deployments**, choose the latest commit on the production
    branch, and select **Redeploy**. Check the build log for the generated
    Prisma Client and successful Next.js build.

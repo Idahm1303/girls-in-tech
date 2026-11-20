@@ -5,6 +5,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { UserRole, AccountStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import {
+  clearQrRegistrationAttribution,
+  getQrRegistrationAttribution,
+} from "@/lib/qr-attribution";
 import { getCurrentMember } from "@/lib/member-access";
 import { registerMentor } from "@/lib/mentor-service";
 import {
@@ -225,6 +229,7 @@ export async function registerMentorAction(
     const parsed = mentorRegistrationSchema.safeParse(readForm(formData));
     if (!parsed.success) return { errors: firstFieldErrors(parsed.error) };
     const registration: MentorRegistrationFields = parsed.data;
+    const qrAttribution = await getQrRegistrationAttribution();
     fields = registration;
 
     const passwordHash = await hash(registration.password, 12);
@@ -252,6 +257,12 @@ export async function registerMentorAction(
               role: UserRole.MENTOR,
               status: AccountStatus.PENDING,
               consentAt: new Date(),
+              ...(qrAttribution
+                ? {
+                    registrationQrCodeId: qrAttribution.qrCodeId,
+                    registrationQrScannedAt: qrAttribution.scannedAt,
+                  }
+                : {}),
             },
             select: { id: true },
           });
@@ -266,6 +277,7 @@ export async function registerMentorAction(
     });
 
     if (!result.ok) return { errors: { email: result.message } };
+    await clearQrRegistrationAttribution();
   }
 
   const adminEmail = process.env.GIT_ADMIN_EMAIL;
