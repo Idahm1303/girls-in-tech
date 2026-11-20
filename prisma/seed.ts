@@ -3,8 +3,18 @@ import { hash } from "bcryptjs";
 import { loadEnvConfig } from "@next/env";
 
 loadEnvConfig(process.cwd());
+if (process.env.NODE_ENV === "production") {
+  throw new Error(
+    "The sample seed is development-only. Use npm run db:seed:admin to provision a production administrator.",
+  );
+}
+const directDatabaseUrl =
+  process.env.DIRECT_URL ?? process.env.DATABASE_URL_UNPOOLED;
+if (!directDatabaseUrl) {
+  throw new Error("Set DIRECT_URL before running the sample seed.");
+}
 const prisma = new PrismaClient({
-  datasourceUrl: process.env.DATABASE_URL_UNPOOLED,
+  datasourceUrl: directDatabaseUrl,
 });
 
 const interestNames = [
@@ -59,14 +69,19 @@ function hoursAfter(date: Date, hours: number) {
 }
 
 async function main() {
-  const passwordHash = await hash("GirlsInTech2026!", 12);
+  const adminPassword = process.env.GIT_ADMIN_PASSWORD;
+  if (!adminPassword) throw new Error("Set GIT_ADMIN_PASSWORD before seeding.");
+  const adminEmail =
+    process.env.GIT_ADMIN_EMAIL?.trim().toLowerCase() ||
+    "admin@git.tut.ac.za";
+  const passwordHash = await hash(adminPassword, 12);
   const mentorPasswordHash = await hash("ChangeMe123!", 12);
   const admin = await prisma.user.upsert({
-    where: { email: "admin@git.tut.ac.za" },
+    where: { email: adminEmail },
     update: { name: "GiT Administrator", passwordHash, role: UserRole.ADMIN, status: AccountStatus.APPROVED },
     create: {
       name: "GiT Administrator",
-      email: "admin@git.tut.ac.za",
+      email: adminEmail,
       passwordHash,
       role: UserRole.ADMIN,
       status: AccountStatus.APPROVED,

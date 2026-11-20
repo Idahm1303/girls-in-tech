@@ -10,8 +10,14 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
+const deploymentHost =
+  process.env.VERCEL_URL ?? process.env.VERCEL_PROJECT_PRODUCTION_URL;
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (deploymentHost ? `https://${deploymentHost}` : undefined);
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: siteUrl ? new URL(siteUrl) : undefined,
   title: "Girls in Tech | TUT ICT",
   description:
     "Limitless minds. Infinite Code. Find your people, grow your skills, and shape the future of tech with Girls in Tech at TUT Faculty of ICT.",
