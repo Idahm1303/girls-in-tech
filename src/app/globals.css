@@ -2564,6 +2564,18 @@ summary {
   height: 100%;
 }
 
+.team-member-avatar {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  background: var(--periwinkle-soft);
+  color: var(--navy);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
 .team-member-photo-chin-clearance {
   display: grid;
   aspect-ratio: 5 / 6;

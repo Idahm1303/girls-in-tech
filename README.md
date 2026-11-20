@@ -93,6 +93,16 @@ PostgreSQL `StoredFile` table. Do not upload CVs or PDFs.
 - `npm run db:seed:admin` creates an administrator without changing an existing
   account, using `GIT_ADMIN_EMAIL`, `GIT_ADMIN_PASSWORD`, and optionally
   `GIT_ADMIN_NAME`.
+- `npm run db:seed:team` upserts the public team roster and photo paths without
+  deleting existing records; use `DATABASE_URL_UNPOOLED` for the target
+  database.
+
+Team photo uploads use public Vercel Blob storage. Connect a public Blob store
+to the Vercel project; the SDK uses Vercel's `BLOB_STORE_ID` and
+`VERCEL_OIDC_TOKEN` connection automatically. For local development, connect
+the Development environment and run `vercel env pull`. A static
+`BLOB_READ_WRITE_TOKEN` can be used instead when OIDC is unavailable; keep it
+server-side and never expose it to browser code.
 
 ## Vercel deployment
 
@@ -119,6 +129,9 @@ PostgreSQL `StoredFile` table. Do not upload CVs or PDFs.
    also used when provisioning an admin. `GIT_ADMIN_PASSWORD` (12–128
    characters) and optional `GIT_ADMIN_NAME` are needed only by the admin seed
    command; do not commit them.
+   For team photo uploads, connect a **Public** Vercel Blob store to this
+   project in the Storage tab. Vercel supplies the Blob connection variables;
+   if you use a static token instead, add `BLOB_READ_WRITE_TOKEN`.
 4. From a trusted terminal, set the production pooled `DATABASE_URL` and direct
    `DATABASE_URL_UNPOOLED`, then run:
 
@@ -130,6 +143,10 @@ PostgreSQL `StoredFile` table. Do not upload CVs or PDFs.
    `GIT_ADMIN_PASSWORD`, then run `npm run db:seed:admin`. This script uses the
    direct connection, creates only a new admin, and refuses to change an
    existing account. Do not run `npm run db:seed` against production.
+   To safely sync the team member photo paths, set
+   `DATABASE_URL_UNPOOLED` to the production direct URL and run
+   `npm run db:seed:team`. It upserts the five team records and does not reset
+   or delete other rows.
 5. In Vercel, open **Deployments**, choose the latest commit on the production
    branch, and select **Redeploy**. Check the build log for the generated
    Prisma Client and successful Next.js build.

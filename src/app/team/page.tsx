@@ -1,34 +1,34 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { TeamMemberCard } from "@/components/team/team-member-card";
+import { prisma } from "@/lib/prisma";
+import { teamRoster } from "@/lib/team-roster";
 
 export const metadata: Metadata = {
   title: "Our Team | Girls in Tech",
   description: "Meet the Girls in Tech organisers for the Soshanguve Campus.",
 };
 
-const coLeads = [
-  {
-    name: "Idah Mokwena",
-    role: "Co-Lead Organiser",
-    imageSrc: "/team/idah-mokwena.jfif",
-  },
-  {
-    name: "Refiloe Mthethwa",
-    role: "Co-Lead Organiser",
-    imageSrc: "/team/refiloe-mthethwa-full-face-v2.jpg",
-  },
-  {
-    name: "Tshegofatso Letsoalo",
-    role: "Co-Lead Organiser",
-  },
-  {
-    name: "Kgothatso Monono",
-    role: "Girls in Tech Journalist",
-    imageSrc: "/team/kgothatso-monono.jfif",
-  },
-];
+export default async function TeamPage() {
+  await connection();
+  const photoByName = new Map<string, string>();
+  try {
+    const savedMembers = await prisma.teamMember.findMany({
+      where: { name: { in: teamRoster.map((member) => member.name) } },
+      select: { name: true, imageUrl: true },
+    });
+    for (const member of savedMembers) {
+      if (member.imageUrl) photoByName.set(member.name, member.imageUrl);
+    }
+  } catch (error) {
+    console.error(
+      "Could not load saved team photos; using repository portraits.",
+      error,
+    );
+  }
 
-export default function TeamPage() {
+  const [leadOrganiser, ...coLeads] = teamRoster;
+
   return (
     <main className="team-page">
       <section aria-labelledby="team-title" className="team-inner">
@@ -43,10 +43,11 @@ export default function TeamPage() {
           <h2 className="team-section-title" id="lead-organiser-title">Lead organiser</h2>
           <TeamMemberCard
             featured
-            imageSrc="/team/dr-thembeka-manetje.jpg"
-            name="Dr Thembeka Manetje"
-            portraitFraming="chin-clearance"
-            role="Lead Organiser"
+            imageSrc={photoByName.get(leadOrganiser.name) ?? leadOrganiser.imageSrc}
+            fallbackImageSrc={leadOrganiser.imageSrc}
+            name={leadOrganiser.name}
+            portraitFraming={leadOrganiser.portraitFraming}
+            role={leadOrganiser.role}
           />
         </section>
 
@@ -55,10 +56,11 @@ export default function TeamPage() {
           <div className="team-co-leads-grid">
             {coLeads.map((member) => (
               <TeamMemberCard
-                imageSrc={member.imageSrc}
+                imageSrc={photoByName.get(member.name) ?? member.imageSrc}
+                fallbackImageSrc={member.imageSrc}
                 key={member.name}
                 name={member.name}
-                portraitFraming={member.name === "Refiloe Mthethwa" ? "chin-clearance" : "default"}
+                portraitFraming={member.portraitFraming}
                 role={member.role}
               />
             ))}

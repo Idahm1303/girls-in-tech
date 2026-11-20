@@ -8,19 +8,21 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test src/lib/account-validation.test.ts src/lib/mentor-registration.test.ts src/lib/about-content.test.ts",
+    "test": "tsx --test src/lib/account-validation.test.ts src/lib/mentor-registration.test.ts src/lib/about-content.test.ts src/lib/team-avatar.test.ts",
     "db:generate": "prisma generate",
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "db:seed:admin": "tsx prisma/seed-admin.ts"
+    "db:seed:admin": "tsx prisma/seed-admin.ts",
+    "db:seed:team": "tsx prisma/seed-team.ts"
   },
   "dependencies": {
     "@neon/config": "^1.11.3",
     "@neon/env": "^1.6.15",
     "@next/env": "^16.4.5",
     "@prisma/client": "^6.19.3",
+    "@vercel/blob": "^2.9.0",
     "bcryptjs": "^3.0.3",
     "next": "16.4.5",
     "next-auth": "^5.0.0-beta.32",

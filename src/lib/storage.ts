@@ -1,6 +1,7 @@
 import "server-only";
 import sharp from "sharp";
 import type { Prisma } from "@prisma/client";
+import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
 
 const MAX_UPLOAD_SIZE = 2 * 1024 * 1024;
@@ -31,6 +32,52 @@ function detectImageMimeType(bytes: Buffer) {
     return "image/webp";
   }
   return null;
+}
+
+export async function uploadTeamMemberPhoto(name: string, file: File) {
+  if (file.size === 0 || file.size > MAX_UPLOAD_SIZE) {
+    throw new StorageValidationError("Choose an image smaller than 2 MB.");
+  }
+
+  const input = Buffer.from(await file.arrayBuffer());
+  const mimeType = detectImageMimeType(input);
+  if (!mimeType) {
+    throw new StorageValidationError("Upload a valid JPG, PNG, or WebP image.");
+  }
+
+  const metadata = await sharp(input, {
+    limitInputPixels: 25_000_000,
+  })
+    .metadata()
+    .catch(() => null);
+  if (!metadata?.width || !metadata.height || !metadata.format) {
+    throw new StorageValidationError("The uploaded image could not be read.");
+  }
+  if (
+    (mimeType === "image/jpeg" && metadata.format !== "jpeg") ||
+    (mimeType === "image/png" && metadata.format !== "png") ||
+    (mimeType === "image/webp" && metadata.format !== "webp")
+  ) {
+    throw new StorageValidationError("The image content does not match its file type.");
+  }
+
+  const slug = name
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  const extension = mimeType === "image/jpeg" ? "jpg" : mimeType.slice("image/".length);
+  const blob = await put(
+    `team/${slug || "team-member"}.${extension}`,
+    file,
+    {
+      access: "public",
+      addRandomSuffix: true,
+      contentType: mimeType,
+    },
+  );
+  return blob.url;
 }
 
 export async function storeMentorPhoto(

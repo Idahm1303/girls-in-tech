@@ -73,6 +73,10 @@ async function AdminContent({
               ? "Please complete each About page text field and keep it within the allowed length."
               : error === "team-not-found"
                 ? "That team member could not be found. Refresh and try again."
+                : error === "team-photo-invalid"
+                  ? "Choose a valid JPG, PNG, or WebP image smaller than 2 MB."
+                  : error === "team-photo-upload"
+                    ? "The photo could not be uploaded. Check the Vercel Blob connection and try again."
                 : "Please check the team member name, role, and photo URL."}
           </p>
         )}
@@ -144,7 +148,8 @@ async function AdminContent({
         <section aria-labelledby="about-team-title" className="admin-students">
           <h2 id="about-team-title">Meet the team</h2>
           <p className="field-hint">
-            Use a local image path or an HTTPS photo URL. Leave the photo blank to show initials.
+            Upload to hosted storage or use an HTTPS photo URL or local public path.
+            Leave the photo blank to show initials.
           </p>
           {teamMembers.length === 0 && (
             <p className="field-hint">No team members yet. Add the team profiles below.</p>
@@ -187,6 +192,15 @@ async function AdminContent({
                   defaultValue={member.imageUrl ?? ""}
                 />
               </div>
+              <div className="form-field">
+                <label htmlFor={`team-photo-upload-${member.id}`}>Upload a photo</label>
+                <input
+                  accept="image/jpeg,image/png,image/webp"
+                  id={`team-photo-upload-${member.id}`}
+                  name="photo"
+                  type="file"
+                />
+              </div>
               <button className="button button-outline-dark" type="submit">
                 Save {member.name}
               </button>
@@ -215,6 +229,15 @@ async function AdminContent({
                 maxLength={500}
                 name="imageUrl"
                 placeholder="/team/name.jpg"
+              />
+            </div>
+            <div className="form-field">
+              <label htmlFor="new-team-photo-upload">Upload a photo</label>
+              <input
+                accept="image/jpeg,image/png,image/webp"
+                id="new-team-photo-upload"
+                name="photo"
+                type="file"
               />
             </div>
             <button className="button button-navy" type="submit">

@@ -9,6 +9,10 @@ import {
   aboutTeamMemberSchema,
 } from "@/lib/about-content";
 import { prisma } from "@/lib/prisma";
+import {
+  StorageValidationError,
+  uploadTeamMemberPhoto,
+} from "@/lib/storage";
 
 function formText(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -48,7 +52,21 @@ export async function saveAboutTeamMember(formData: FormData) {
   if (!parsed.success) redirect("/admin/content?error=team-invalid");
 
   const { id, name, roleTitle, imageUrl } = parsed.data;
-  const data = { name, roleTitle, imageUrl: imageUrl || null };
+  let savedImageUrl = imageUrl;
+  const photo = formData.get("photo");
+  if (photo instanceof File && photo.size > 0) {
+    try {
+      savedImageUrl = await uploadTeamMemberPhoto(name, photo);
+    } catch (error) {
+      if (error instanceof StorageValidationError) {
+        redirect("/admin/content?error=team-photo-invalid");
+      }
+      console.error("Team member photo upload failed.", error);
+      redirect("/admin/content?error=team-photo-upload");
+    }
+  }
+
+  const data = { name, roleTitle, imageUrl: savedImageUrl || null };
   if (id) {
     const result = await prisma.teamMember.updateMany({
       where: { id },
@@ -69,6 +87,7 @@ export async function saveAboutTeamMember(formData: FormData) {
   }
 
   revalidatePath("/about");
+  revalidatePath("/team");
   revalidatePath("/admin/content");
   redirect("/admin/content?updated=team");
 }

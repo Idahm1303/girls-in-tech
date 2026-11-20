@@ -1,6 +1,7 @@
-import { PrismaClient, UserRole, AccountStatus, Campus, EventStatus, OpportunityType, TeamRoleTitle, PostStatus, MentorApplicationStatus } from "@prisma/client";
+import { PrismaClient, UserRole, AccountStatus, Campus, EventStatus, OpportunityType, PostStatus, MentorApplicationStatus } from "@prisma/client";
 import { hash } from "bcryptjs";
 import { loadEnvConfig } from "@next/env";
+import { upsertTeamRoster } from "./team-seed";
 
 loadEnvConfig(process.cwd());
 if (process.env.NODE_ENV === "production") {
@@ -350,21 +351,7 @@ async function main() {
     });
   }
 
-  const team = [
-    ["Ayesha Mokoena", TeamRoleTitle.LEAD, "Leading the GiT community and helping turn ambitious ideas into action."],
-    ["Lindiwe Nkosi", TeamRoleTitle.FACILITATOR, "Creating welcoming spaces to learn, share, and build together."],
-    ["Mia Dube", TeamRoleTitle.JOURNALIST, "Sharing stories, ideas, and opportunities from across the community."],
-    ["Rethabile Molefe", TeamRoleTitle.COMMITTEE, "Bringing members together through events and peer support."],
-  ] as const;
-
-  for (const [displayOrder, [name, roleTitle, bio]] of team.entries()) {
-    const existing = await prisma.teamMember.findFirst({ where: { name } });
-    if (existing) {
-      await prisma.teamMember.update({ where: { id: existing.id }, data: { roleTitle, bio, displayOrder } });
-    } else {
-      await prisma.teamMember.create({ data: { name, roleTitle, bio, displayOrder } });
-    }
-  }
+  await upsertTeamRoster(prisma);
 
   await prisma.post.upsert({
     where: { slug: "welcome-to-girls-in-tech" },
