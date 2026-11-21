@@ -49,5 +49,5 @@ export function getQrSiteOrigin() {
 }
 
 export function getQrPublicUrl(slug: string) {
-  return new URL(`/join/${encodeURIComponent(slug)}`, getQrSiteOrigin()).toString();
+  return new URL(`/qr/${encodeURIComponent(slug)}`, getQrSiteOrigin()).toString();
 }

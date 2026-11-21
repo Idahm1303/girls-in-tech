@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { connection } from "next/server";
-import { CopyQrLinkButton } from "./copy-link-button";
+import { CopyQrLinkButton, PrintQrPosterButton } from "./copy-link-button";
 import { requireAdmin } from "@/lib/member-access";
 import { prisma } from "@/lib/prisma";
 import {
@@ -105,8 +105,8 @@ async function QrCodeDetail({
     console.error("Could not build the public QR link.", error);
   }
   const downloads = [
-    { format: "png", label: "Download PNG" },
     { format: "svg", label: "Download SVG" },
+    { format: "png", label: "Download PNG (2400px wide)" },
   ];
 
   return (
@@ -133,15 +133,18 @@ async function QrCodeDetail({
           <div className="qr-image-panel">
             {publicUrl ? (
               <>
-                <Image
-                  alt={`QR code for ${code.name}`}
-                  className="qr-detail-image"
-                  height={1200}
-                  src={`/api/admin/qr-codes/${code.id}/image?format=png`}
-                  unoptimized
-                  width={1024}
-                />
-                <p className="qr-image-caption">Scan to join Girls in Tech</p>
+                <div className="qr-print-poster">
+                  <h2>Join Girls in Tech</h2>
+                  <Image
+                    alt={`QR code for ${code.name}`}
+                    className="qr-detail-image"
+                    height={2800}
+                    src={`/api/admin/qr-codes/${code.id}/image?format=png`}
+                    unoptimized
+                    width={2400}
+                  />
+                  <p className="qr-image-caption">Scan to join Girls in Tech</p>
+                </div>
                 <div className="qr-download-actions">
                   {downloads.map((download) => (
                     <a
@@ -153,6 +156,7 @@ async function QrCodeDetail({
                       {download.label}
                     </a>
                   ))}
+                  <PrintQrPosterButton />
                 </div>
                 <CopyQrLinkButton link={publicUrl} />
                 <label className="qr-link-label" htmlFor="qr-public-link">Printed QR link</label>

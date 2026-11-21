@@ -23,3 +23,15 @@ export function CopyQrLinkButton({ link }: { link: string }) {
     </div>
   );
 }
+
+export function PrintQrPosterButton() {
+  return (
+    <button
+      className="button button-outline-dark qr-no-print"
+      onClick={() => window.print()}
+      type="button"
+    >
+      Print A4 poster
+    </button>
+  );
+}

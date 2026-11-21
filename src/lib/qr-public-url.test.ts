@@ -17,7 +17,7 @@ function withSiteUrl(value: string | undefined, callback: () => void) {
 
 test("QR links use the configured public HTTPS origin and slug", () => {
   withSiteUrl("https://girls.example", () => {
-    assert.equal(getQrPublicUrl("orientation-week"), "https://girls.example/join/orientation-week");
+    assert.equal(getQrPublicUrl("orientation-week"), "https://girls.example/qr/orientation-week");
     assert.equal(getQrSiteOrigin().origin, "https://girls.example");
   });
 });

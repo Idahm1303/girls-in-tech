@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { loadEnvConfig } from "@next/env";
-import { upsertDefaultQrCode } from "./qr-seed";
+import { upsertJoinQrCode } from "./qr-seed";
 
 loadEnvConfig(process.cwd());
 
@@ -18,14 +18,19 @@ const prisma = new PrismaClient({ datasourceUrl: directDatabaseUrl });
 
 async function main() {
   try {
-    await upsertDefaultQrCode(prisma);
-    console.log("The Main QR code was upserted; no records were deleted.");
+    const qrCode = await upsertJoinQrCode(prisma);
+    console.log("Join GiT QR code is ready:", {
+      name: qrCode.name,
+      slug: qrCode.slug,
+      destinationPath: qrCode.destinationPath,
+      isActive: qrCode.isActive,
+    });
   } finally {
     await prisma.$disconnect();
   }
 }
 
 main().catch((error: unknown) => {
-  console.error("Default QR seeding failed:", error);
+  console.error("Join GiT QR seeding failed:", error);
   process.exitCode = 1;
 });
