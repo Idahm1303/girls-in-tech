@@ -37,18 +37,28 @@ async function AboutContent() {
       error,
     );
   }
-
   return (
     <main className="events-page about-page">
       <section aria-labelledby="about-title" className="events-inner about-inner">
-        <p className="eyebrow">Girls in Tech · Faculty of ICT</p>
-        <h1 id="about-title">About Girls in Tech</h1>
+        <header className="about-hero">
+          <p className="eyebrow">Girls in Tech · Faculty of ICT</p>
+          <h1 id="about-title">About Girls in Tech</h1>
+          <p aria-hidden="true" className="about-motto">
+            {BRAND.motto}
+          </p>
+        </header>
 
-        <section aria-label="Introduction" className="about-content-section">
+        <section
+          aria-label="Introduction"
+          className="about-content-section about-introduction"
+        >
           <p>{content.introduction}</p>
         </section>
 
-        <section aria-labelledby="about-what-we-do" className="about-content-section">
+        <section
+          aria-labelledby="about-what-we-do"
+          className="about-content-section about-what-we-do"
+        >
           <h2 id="about-what-we-do">What we do</h2>
           <p>{content.whatWeDo}</p>
         </section>
@@ -64,7 +74,10 @@ async function AboutContent() {
           </div>
         </section>
 
-        <section aria-labelledby="about-commitment" className="about-content-section">
+        <section
+          aria-labelledby="about-commitment"
+          className="about-content-section about-commitment"
+        >
           <h2 id="about-commitment">Our commitment</h2>
           <p>{content.commitment}</p>
         </section>
